@@ -3,7 +3,7 @@ package swyg.vitalroutes.s3;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,9 @@ public class S3UploadService {
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());
 
+        // 파일 저장 메서드
         amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
+        // getUrl : 파일이 저장된 URL 을 return, 해당 URL 로 이동 시 파일이 오픈
         return amazonS3.getUrl(bucket, originalFilename).toString();
     }
 
@@ -38,7 +40,7 @@ public class S3UploadService {
 
         String contentDisposition = "attachment; filename=\"" +  originalFilename + "\"";
 
-        // header에 CONTENT_DISPOSITION 설정을 통해 클릭 시 다운로드 진행
+        // header 에 CONTENT_DISPOSITION 설정을 통해 클릭 시 다운로드 진행
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                 .body(urlResource);
