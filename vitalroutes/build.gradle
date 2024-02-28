@@ -35,6 +35,8 @@ dependencies {
 	implementation 'com.drewnoakes:metadata-extractor:2.18.0'	// 사진에서 위도, 경도 추출 라이브러리
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'	// Swagger SpringDoc
 
+	developmentOnly 'org.springframework.boot:spring-boot-devtools' // 백엔드 서버 자동 빌드
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
