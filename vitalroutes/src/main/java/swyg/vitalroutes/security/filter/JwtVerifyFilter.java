@@ -21,12 +21,14 @@ import java.util.Map;
 @Slf4j
 public class JwtVerifyFilter extends OncePerRequestFilter {
 
-    private static final String[] whitelist = {"/", "/member/duplicateCheck" ,"/member/signUp", "/member/login", "/token/refresh", "/post/**"};
+    private static final String[] whitelist = {"/", "/member/duplicateCheck" ,"/member/signUp", "/member/login", "/token/refresh", "/post/**",
+            "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**"};
 
     // 필터를 거치지 않을 URL 을 설정하고, true 를 return 하면 현재 필터를 건너뛰고 다음 필터로 이동
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String requestURI = request.getRequestURI();
+        log.info("uri = {}", requestURI);
         return PatternMatchUtils.simpleMatch(whitelist, requestURI);
     }
 
