@@ -1,5 +1,6 @@
 package swyg.vitalroutes.security.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,15 @@ import java.util.Map;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class TokenRefreshController {
+
+    private final JwtTokenProvider jwtTokenProvider;
+
     @PostMapping("/token/refresh")
     public ResponseEntity<?> tokenRefresh(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> body) {
-        JwtTokenProvider.checkAuthorizationHeader(authHeader);
-        String accessToken = JwtTokenProvider.getTokenFromHeader(authHeader);
+        jwtTokenProvider.checkAuthorizationHeader(authHeader);
+        String accessToken = jwtTokenProvider.getTokenFromHeader(authHeader);
         String refreshToken = body.get("refreshToken");
 
         log.info("refresh Token = {}", refreshToken);
@@ -32,10 +37,10 @@ public class TokenRefreshController {
         Map<String, String> res = new HashMap<>();
 
         // Access Token 만료 여부 확인
-        if (JwtTokenProvider.isExpired(accessToken)) {
+        if (jwtTokenProvider.isExpired(accessToken)) {
             try {
-                Map<String, Object> claims = JwtTokenProvider.validateToken(refreshToken);
-                accessToken = JwtTokenProvider.generateToken(claims, JwtConstants.ACCESS_EXP_TIME);
+                Map<String, Object> claims = jwtTokenProvider.validateToken(refreshToken);
+                accessToken = jwtTokenProvider.generateToken(claims, JwtConstants.ACCESS_EXP_TIME);
             } catch (JwtTokenException exception) {
                 throw new JwtTokenException(400, "Refresh Token 이 만료되었습니다");
             }

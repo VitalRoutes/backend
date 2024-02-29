@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,10 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 @Slf4j
+@RequiredArgsConstructor
 public class JwtVerifyFilter extends OncePerRequestFilter {
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     private static final String[] whitelist = {"/", "/member/duplicateCheck" ,"/member/signUp", "/member/login", "/token/refresh", "/post/**",
             "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**"};
@@ -39,9 +43,9 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader(JwtConstants.JWT_HEADER);
 
         try {
-            JwtTokenProvider.checkAuthorizationHeader(authHeader);
-            String token = JwtTokenProvider.getTokenFromHeader(authHeader); // Bearer 을 생략하고 토큰만 추출
-            Authentication authentication = JwtTokenProvider.getAuthentication(token);
+            jwtTokenProvider.checkAuthorizationHeader(authHeader);
+            String token = jwtTokenProvider.getTokenFromHeader(authHeader); // Bearer 을 생략하고 토큰만 추출
+            Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
             log.info("authentication = {}", authentication);
 

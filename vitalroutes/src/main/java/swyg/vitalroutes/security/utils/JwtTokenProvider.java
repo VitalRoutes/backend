@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -17,13 +18,13 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
-@Component
 public class JwtTokenProvider {
 
-    public static String secretKey = JwtConstants.key;
+    @Value("${jwt.secretKey}")
+    public String secretKey;
 
     // Bearer XXX 형태로 토큰이 전달되는지 체크
-    public static void checkAuthorizationHeader(String header) {
+    public void checkAuthorizationHeader(String header) {
         if(header == null) {
             throw new JwtTokenException(400, "토큰이 전달되지 않았습니다");
         } else if (!header.startsWith(JwtConstants.JWT_TYPE)) {
@@ -33,14 +34,14 @@ public class JwtTokenProvider {
 
 
     // 헤더에 "Bearer XXX" 형식으로 담겨온 토큰을 추출한다
-    public static String getTokenFromHeader(String header) {
+    public String getTokenFromHeader(String header) {
         return header.split(" ")[1];
     }
 
-    public static String generateToken(Map<String, Object> claims, int validTime) {
+    public String generateToken(Map<String, Object> claims, int validTime) {
         SecretKey key = null;
         try {
-            key = Keys.hmacShaKeyFor(JwtTokenProvider.secretKey.getBytes(StandardCharsets.UTF_8));
+            key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         } catch(Exception e){
             throw new RuntimeException(e.getMessage());
         }
@@ -53,7 +54,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public static Authentication getAuthentication(String token) {
+    public Authentication getAuthentication(String token) {
 
         Map<String, Object> claims = validateToken(token);
 
@@ -74,10 +75,10 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(member, "", userDetails.getAuthorities());
     }
 
-    public static Map<String, Object> validateToken(String token) {
+    public Map<String, Object> validateToken(String token) {
         Map<String, Object> claim = null;
         try {
-            SecretKey key = Keys.hmacShaKeyFor(JwtTokenProvider.secretKey.getBytes(StandardCharsets.UTF_8));
+            SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
             claim = Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
@@ -95,7 +96,7 @@ public class JwtTokenProvider {
      * 토큰 갱신 시, 토큰이 만료되었는지 판단하는 메서드
      * validateToken 은 예외를 던져버리기 때문에 따로 메서드를 생성
      */
-    public static boolean isExpired(String token) {
+    public boolean isExpired(String token) {
         try {
             validateToken(token);
         } catch (JwtTokenException exception) {

@@ -15,6 +15,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import swyg.vitalroutes.security.filter.JwtVerifyFilter;
 import swyg.vitalroutes.security.handler.CommonLoginFailHandler;
 import swyg.vitalroutes.security.handler.CommonLoginSuccessHandler;
+import swyg.vitalroutes.security.utils.JwtTokenProvider;
 
 import java.util.List;
 
@@ -26,8 +27,13 @@ public class SecurityConfig {
     }
 
     @Bean
+    public JwtTokenProvider jwtTokenProvider() {
+        return new JwtTokenProvider();
+    }
+
+    @Bean
     public CommonLoginSuccessHandler commonLoginSuccessHandler() {
-        return new CommonLoginSuccessHandler();
+        return new CommonLoginSuccessHandler(jwtTokenProvider());
     }
 
     @Bean
@@ -37,7 +43,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtVerifyFilter jwtVerifyFilter() {
-        return new JwtVerifyFilter();
+        return new JwtVerifyFilter(jwtTokenProvider());
     }
 
 

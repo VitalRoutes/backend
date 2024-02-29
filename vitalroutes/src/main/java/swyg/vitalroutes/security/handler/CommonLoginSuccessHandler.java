@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -17,7 +18,11 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 @Slf4j
+@RequiredArgsConstructor
 public class CommonLoginSuccessHandler implements AuthenticationSuccessHandler {
+
+    private final JwtTokenProvider jwtTokenProvider;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("--------------------------- CommonLoginSuccessHandler ---------------------------");
@@ -26,8 +31,8 @@ public class CommonLoginSuccessHandler implements AuthenticationSuccessHandler {
         Member member = principal.getMember();
 
         Map<String, Object> claims = member.getClaims();
-        claims.put("accessToken", JwtTokenProvider.generateToken(claims, JwtConstants.ACCESS_EXP_TIME));
-        claims.put("refreshToken", JwtTokenProvider.generateToken(claims, JwtConstants.REFRESH_EXP_TIME));
+        claims.put("accessToken", jwtTokenProvider.generateToken(claims, JwtConstants.ACCESS_EXP_TIME));
+        claims.put("refreshToken", jwtTokenProvider.generateToken(claims, JwtConstants.REFRESH_EXP_TIME));
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(claims);
