@@ -33,4 +33,15 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
+
+    // JWT 토큰에 들어갈 정보
+    public Map<String, Object> getClaims() {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("memberId", memberId);
+        dataMap.put("profile", profile);
+        dataMap.put("name", name);
+        dataMap.put("nickname", nickname);
+        dataMap.put("email", email);
+        return dataMap;
+    }
 }
