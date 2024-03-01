@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: ENC(jO49RGHnkCNy+rqEKuRQ4du128xO/FGprtYMt5NCX0iNdSjOFsbOCY/h/hSWLBPbKUa0zp2gAIFhYBsNShkXCgJw05bgcInPTm47U3/FqH7yBwWuOSVXNzhhmM6CxYTzhMKyPlGjOKo8VDafXIP1qwjM/DtXjLpi)
+    username: ENC(WXJRUma8h4Aa17BMomL3Vw==)
+    password: ENC(ep1lvgJv5L9UAVQJQQW/Zg==)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  thymeleaf:
+    cache: false
+
+  # spring data jpa ??
+  jpa:
+      #database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none # ?? ?? ? update? ????? data? ??? ? ??.
+        #ddl-auto: update
+
+    properties:
+      hibernate.format_sql: true
+      dialect: org.hibernate.dialect.MySQL8InnoDBDialect
+
+cloud:
+  aws:
+    s3:
+      bucket: vital-routes-bucket
+    credentials:
+      access-key: ENC(2UXJ1AxBkq3TG2fwyJCs1vLw+/WrHm8AajRtFc2rwlA=)
+      secret-key: ENC(oaAgrjsbeLI9IIbNywgyUKqhytarQldrn6NcS+W/c2xQpVfydNgE+cCoKMxAquR4TRQQ0SPHHd8=)
+      instanceProfile: true
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+
+jwt:
+  secretKey: ENC(m3IxdMw3rZhPueIyGSClgkAQOviME+/yA6S+AETPaarWVD2ovNemTeLn1KfHGDSH9eEcX7BlprKJa4ew4W3gT+ixH9R6JPqOVc2WUVOYOOSNGP4I6ANgEA==)
+
