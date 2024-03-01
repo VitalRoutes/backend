@@ -1,7 +1,11 @@
 package swyg.vitalroutes.security.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,11 +35,20 @@ public class TokenRefreshController {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Operation(description = "{'refreshToken' : 'aaaaaa'} 형태로 전달필요", summary = "Access Token 갱신")
+    @Operation(description = "Access Token 을 헤더에 Bearer XXX 형태로, Refresh Token 을 body 에 전달하여 Access Token 을 갱신", summary = "Access Token 갱신")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
-                    description = "정상적으로 access token 이 갱신됨",
-                    content = @Content(mediaType = "application/json"))
+            @ApiResponse(responseCode = "OK",
+                    description = "Access Token 과 Refresh Token 이 data 에 담겨서 전달",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDTO.class))),
+            @ApiResponse(responseCode = "BAD_REQUEST",
+                    description = "refresh token 이 전달되지 않음",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDTO.class))),
+            @ApiResponse(responseCode = "UNAUTHORIZED",
+                    description = "refresh token 이 만료, 재로그인 필요",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDTO.class)))
+    })
+    @Parameters(value = {
+            @Parameter(name = "Authorization", required = true, description = "Access Token 을 Bearer 형태로 전달해야함")
     })
     @PostMapping("/token/refresh")
     public ApiResponseDTO<?> tokenRefresh(@RequestHeader("Authorization") String authHeader, @RequestBody RefreshTokenDTO dto) {
@@ -57,7 +70,7 @@ public class TokenRefreshController {
                 Map<String, Object> claims = jwtTokenProvider.validateToken(refreshToken);
                 accessToken = jwtTokenProvider.generateToken(claims, JwtConstants.ACCESS_EXP_TIME);
             } catch (JwtTokenException exception) {
-                return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "refresh Token 이 만료되었습니다", null);
+                return new ApiResponseDTO<>(UNAUTHORIZED, FAIL, "refresh Token 이 만료되었습니다. 다시 로그인해 주세요", null);
             }
         }
 

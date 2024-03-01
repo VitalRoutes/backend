@@ -48,8 +48,7 @@ public class KakaoLoginController {
 
     @Operation(description = "카카오 로그인 페이지로 이동하게 리다이렉트 시킨다", summary = "카카오 로그인 페이지 호출")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "301",
-                    description = "카카오 로그인 화면으로 리다이렉트")}
+            @ApiResponse(description = "카카오 로그인 화면으로 리다이렉트")}
     )
     @GetMapping("/oauth2/kakao")
     public void kakaoRedirect(HttpServletResponse response) throws IOException {
@@ -62,17 +61,17 @@ public class KakaoLoginController {
         response.sendRedirect(uriString);
     }
 
-    @Operation(description = "카카오 로그인 페이지로 이동하게 리다이렉트 시킨다", summary = "카카오 로그인 페이지 호출")
+    @Operation(description = "카카오 로그인 후 전달 받은 인가코드를 전달한다", summary = "카카오 인가코드 전달 및 소셜 로그인 진행")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
-                    description = "로그인 성공, 일반 로그인 성공과 동일한 응답",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "202",
-                    description = "최초 로그인 시 회원가입을 위해 필요한 정보 전달, name, socialId, socialType 데이터만 담겨있음",
+            @ApiResponse(responseCode = "OK SUCCESS(type)",
+                    description = "로그인 성공",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDTO.class))),
+            @ApiResponse(responseCode = "OK ONGOING(type)",
+                    description = "최초 로그인 시 회원가입을 위해 필요한 정보 전달, API 응답 스펙의 data 에 들어가며, 아래 정보들 모두를 회원가입 API 로 전달해야함",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = SocialMemberDTO.class)))
     })
     @Parameters(value = {
-            @Parameter(required = true, description = "카카오 로그인 후 받게 되는 인가코드를 전달해야함")
+            @Parameter(name = "code", required = true, description = "카카오 로그인 후 받게 되는 인가코드를 전달해야함")
     })
     @GetMapping("/oauth2/kakao/login")
     public ApiResponseDTO<?> kakaoLogin(@RequestParam("code") String code) {
