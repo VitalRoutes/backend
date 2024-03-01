@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.domain.MemberSaveDTO;
+import swyg.vitalroutes.member.domain.SocialType;
 import swyg.vitalroutes.member.repository.MemberRepository;
+import swyg.vitalroutes.security.domain.SocialMemberDTO;
 
 import java.util.Optional;
 
@@ -30,6 +32,16 @@ public class MemberService {
                 .nickname(memberDTO.getNickname())
                 .email(memberDTO.getEmail())
                 .password(passwordEncoder.encode(memberDTO.getPassword()))
+                .build();
+        return memberRepository.save(member);
+    }
+
+    public Member saveSocialMember(SocialMemberDTO memberDTO) {
+        Member member = Member.builder()
+                .name(memberDTO.getName())
+                .nickname(memberDTO.getNickname())
+                .socialId(memberDTO.getSocialId())
+                .socialType(SocialType.valueOf(memberDTO.getSocialType()))
                 .build();
         return memberRepository.save(member);
     }
