@@ -38,3 +38,7 @@ cloud:
 jwt:
   secretKey: ENC(m3IxdMw3rZhPueIyGSClgkAQOviME+/yA6S+AETPaarWVD2ovNemTeLn1KfHGDSH9eEcX7BlprKJa4ew4W3gT+ixH9R6JPqOVc2WUVOYOOSNGP4I6ANgEA==)
 
+kakao:
+  login:
+    client-id: ENC(DINFbAY/RI0maEuCPDXuQcCQNp4+CxtI7O+wFoDI1ohNpHMAWvKNo71lDMLPaAy3)
+    redirect-uri: ENC(io/BNG3FIRVo5Elr8qJvP26KazkACWMxO9keK11My/JZZ1jUrvAcvHwAIhuV1j+J)

@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import swyg.vitalroutes.common.exception.JwtTokenException;
+import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.security.utils.JwtConstants;
 import swyg.vitalroutes.security.utils.JwtTokenProvider;
 
@@ -26,7 +27,7 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
     private static final String[] whitelist = {"/", "/member/duplicateCheck" ,"/member/signUp", "/member/login", "/token/refresh", "/post/**",
-            "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**"};
+            "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/oauth2/**"};
 
     // 필터를 거치지 않을 URL 을 설정하고, true 를 return 하면 현재 필터를 건너뛰고 다음 필터로 이동
     @Override
@@ -55,10 +56,12 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
         } catch (JwtTokenException exception) {
 
             response.setContentType("application/json; charset=UTF-8");
-            response.setStatus(exception.getStatusCode());
+            response.setStatus(exception.getStatus().value());
+
+            ApiResponseDTO<Object> apiResponse = new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
 
             ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(Map.of("error", exception.getMessage()));
+            String json = objectMapper.writeValueAsString(apiResponse);
 
             PrintWriter printWriter = response.getWriter();
             printWriter.println(json);
