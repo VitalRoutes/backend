@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import swyg.vitalroutes.common.exception.MemberSignUpException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
+import swyg.vitalroutes.member.domain.MemberNicknameDTO;
 import swyg.vitalroutes.member.domain.MemberSaveDTO;
 import swyg.vitalroutes.member.service.MemberService;
 import swyg.vitalroutes.security.domain.SocialMemberDTO;
@@ -43,13 +44,13 @@ public class MemberController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/member/duplicateCheck")
-    public ApiResponseDTO<?> duplicateCheck(@RequestBody Map<String, String> map) {
-        String nickname = map.get("nickname");
+    public ApiResponseDTO<?> duplicateCheck(@RequestBody MemberNicknameDTO dto) {
+        String nickname = dto.getNickname();
         if (nickname == null) {
             return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "닉네임이 전달되지 않았습니다", null);
         }
         log.info("nickname = {}", nickname);
-        if (memberService.duplicateNicknameCheck(map.get("nickname"))) {
+        if (memberService.duplicateNicknameCheck(dto.getNickname())) {
             return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "이미 존재하는 닉네임입니다", null);
         }
         return new ApiResponseDTO<>(OK, SUCCESS, "닉네임 인증이 완료되었습니다", null);

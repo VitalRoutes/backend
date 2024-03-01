@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import swyg.vitalroutes.common.exception.JwtTokenException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
+import swyg.vitalroutes.security.domain.RefreshTokenDTO;
 import swyg.vitalroutes.security.utils.JwtConstants;
 import swyg.vitalroutes.security.utils.JwtTokenProvider;
 
@@ -37,10 +38,10 @@ public class TokenRefreshController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/token/refresh")
-    public ApiResponseDTO<?> tokenRefresh(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> body) {
+    public ApiResponseDTO<?> tokenRefresh(@RequestHeader("Authorization") String authHeader, @RequestBody RefreshTokenDTO dto) {
         jwtTokenProvider.checkAuthorizationHeader(authHeader);
         String accessToken = jwtTokenProvider.getTokenFromHeader(authHeader);
-        String refreshToken = body.get("refreshToken");
+        String refreshToken = dto.getRefreshToken();
 
         log.info("refresh Token = {}", refreshToken);
 
