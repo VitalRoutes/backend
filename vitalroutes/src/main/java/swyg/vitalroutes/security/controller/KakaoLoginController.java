@@ -12,12 +12,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
+import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.domain.SocialType;
 import swyg.vitalroutes.security.domain.SocialMemberDTO;
@@ -28,6 +27,10 @@ import swyg.vitalroutes.security.utils.JwtTokenProvider;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.OK;
+import static swyg.vitalroutes.common.response.ResponseType.ONGOING;
+import static swyg.vitalroutes.common.response.ResponseType.SUCCESS;
 
 @Tag(name = "Kakao Login API Controller", description = "카카오 소셜 로그인을 위한 controller ")
 @Slf4j
@@ -72,7 +75,7 @@ public class KakaoLoginController {
             @Parameter(required = true, description = "카카오 로그인 후 받게 되는 인가코드를 전달해야함")
     })
     @GetMapping("/oauth2/kakao/login")
-    public ResponseEntity<?> kakaoLogin(@RequestParam("code") String code) {
+    public ApiResponseDTO<?> kakaoLogin(@RequestParam("code") String code) {
         String[] userInfo = kakaoLoginService.kakaoLogin(code);
         Optional<Member> optionalMember = kakaoLoginService.findMember(userInfo[0], SocialType.KAKAO);
         if (optionalMember.isPresent()) {
@@ -82,13 +85,13 @@ public class KakaoLoginController {
             Map<String, Object> claims = member.getClaims();
             claims.put("accessToken", jwtTokenProvider.generateToken(claims, JwtConstants.ACCESS_EXP_TIME));
             claims.put("refreshToken", jwtTokenProvider.generateToken(claims, JwtConstants.REFRESH_EXP_TIME));
-            return ResponseEntity.status(HttpStatus.OK).body(claims);
+            return new ApiResponseDTO<>(OK, SUCCESS, "로그인이 완료되었습니다", claims);
         }
         log.info("----------------------- 회원가입 필요 -----------------------");
         SocialMemberDTO socialMemberDTO = new SocialMemberDTO();
         socialMemberDTO.setName(userInfo[1]);
         socialMemberDTO.setSocialId(userInfo[0]);
         socialMemberDTO.setSocialType("KAKAO");
-        return ResponseEntity.status(HttpStatus.OK).body(socialMemberDTO);
+        return new ApiResponseDTO<>(OK, ONGOING, "회원가입 완료를 위해 닉네임을 설정해주세요", socialMemberDTO);
     }
 }

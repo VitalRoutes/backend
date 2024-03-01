@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import swyg.vitalroutes.common.exception.JwtTokenException;
+import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.security.utils.JwtConstants;
 import swyg.vitalroutes.security.utils.JwtTokenProvider;
 
@@ -55,10 +56,12 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
         } catch (JwtTokenException exception) {
 
             response.setContentType("application/json; charset=UTF-8");
-            response.setStatus(exception.getStatusCode());
+            response.setStatus(exception.getStatus().value());
+
+            ApiResponseDTO<Object> apiResponse = new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
 
             ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(Map.of("error", exception.getMessage()));
+            String json = objectMapper.writeValueAsString(apiResponse);
 
             PrintWriter printWriter = response.getWriter();
             printWriter.println(json);

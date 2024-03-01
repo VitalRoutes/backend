@@ -9,19 +9,21 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import swyg.vitalroutes.common.exception.MemberSignUpException;
+import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.member.domain.MemberSaveDTO;
 import swyg.vitalroutes.member.service.MemberService;
 import swyg.vitalroutes.security.domain.SocialMemberDTO;
 
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.*;
+import static swyg.vitalroutes.common.response.ResponseType.*;
+
 
 @Tag(name = "Member API Controller", description = "Member 회원가입, 로그인을 기능을 제공하는 Controller")
 @Slf4j
@@ -41,16 +43,16 @@ public class MemberController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/member/duplicateCheck")
-    public ResponseEntity<?> duplicateCheck(@RequestBody Map<String, String> map) {
+    public ApiResponseDTO<?> duplicateCheck(@RequestBody Map<String, String> map) {
         String nickname = map.get("nickname");
         if (nickname == null) {
-            throw new MemberSignUpException("닉네임이 전달되지 않았습니다.");
+            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "닉네임이 전달되지 않았습니다", null);
         }
         log.info("nickname = {}", nickname);
         if (memberService.duplicateNicknameCheck(map.get("nickname"))) {
-            throw new MemberSignUpException("이미 존재하는 닉네임입니다.");
+            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "이미 존재하는 닉네임입니다", null);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "닉네임 인증이 완료되었습니다"));
+        return new ApiResponseDTO<>(OK, SUCCESS, "닉네임 인증이 완료되었습니다", null);
     }
 
     @Operation(summary = "회원가입")
@@ -66,24 +68,23 @@ public class MemberController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/member/signUp")
-    public ResponseEntity<?> signUp(@Valid @RequestBody MemberSaveDTO memberDTO, BindingResult bindingResult) {
+    public ApiResponseDTO<?> signUp(@Valid @RequestBody MemberSaveDTO memberDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new MemberSignUpException(bindingResult.getFieldError().getDefaultMessage());
+            throw new MemberSignUpException(BAD_REQUEST, FAIL, bindingResult.getFieldError().getDefaultMessage());
         }
 
         if (!memberDTO.getIsChecked()) {
-            throw new MemberSignUpException("닉네임 중복 확인이 필요합니다");
+            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "닉네임 중복 확인이 필요합니다", null);
         }
 
         try {
             memberService.saveMember(memberDTO);
         } catch (DataIntegrityViolationException e) {
-            throw new MemberSignUpException("중복되는 닉네임 혹은 이메일이 존재합니다");
+            return new ApiResponseDTO<>(CONFLICT,FAIL, "중복되는 닉네임 혹은 이메일이 존재합니다", null);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "회원가입 중 오류가 발생하였습니다"));
+            return new ApiResponseDTO<>(INTERNAL_SERVER_ERROR,ERROR, "회원가입 중 오류가 발생하였습니다", null);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "회원가입이 완료되었습니다"));
+        return new ApiResponseDTO<>(CREATED, SUCCESS, "회원가입이 완료되었습니다", null);
     }
 
     @Operation(summary = "소셜 회원 가입")
@@ -99,23 +100,22 @@ public class MemberController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/oauth2/signUp")
-    public ResponseEntity<?> socialSignUp(@Valid @RequestBody SocialMemberDTO memberDTO, BindingResult bindingResult) {
+    public ApiResponseDTO<?> socialSignUp(@Valid @RequestBody SocialMemberDTO memberDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new MemberSignUpException(bindingResult.getFieldError().getDefaultMessage());
+            throw new MemberSignUpException(BAD_REQUEST, FAIL, bindingResult.getFieldError().getDefaultMessage());
         }
 
         if (!memberDTO.getIsChecked()) {
-            throw new MemberSignUpException("닉네임 중복 확인이 필요합니다");
+            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "닉네임 중복 확인이 필요합니다", null);
         }
 
         try {
             memberService.saveSocialMember(memberDTO);
         } catch (DataIntegrityViolationException e) {
-            throw new MemberSignUpException("중복되는 닉네임이 존재합니다");
+            return new ApiResponseDTO<>(CONFLICT, FAIL, "중복되는 닉네임이 존재합니다", null);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "회원가입 중 오류가 발생하였습니다"));
+            return new ApiResponseDTO<>(INTERNAL_SERVER_ERROR, ERROR, "회원가입 중 오류가 발생하였습니다", null);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "회원가입이 완료되었습니다"));
+        return new ApiResponseDTO<>(CREATED, SUCCESS, "회원가입이 완료되었습니다", null);
     }
 }

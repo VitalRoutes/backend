@@ -3,10 +3,7 @@ package swyg.vitalroutes.security.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -14,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import swyg.vitalroutes.common.exception.KakaoLoginException;
+import swyg.vitalroutes.common.response.ResponseType;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.domain.SocialType;
 import swyg.vitalroutes.member.repository.MemberRepository;
@@ -72,7 +70,7 @@ public class KakaoLoginService {
         ResponseEntity<KakaoTokenResponse> response = restTemplate.exchange(uriComponentsBuilder.toUri(), HttpMethod.POST, request, KakaoTokenResponse.class);
 
         if (response.getStatusCode().value() != 200) {
-            throw new KakaoLoginException(response.getStatusCode().value(), "Access Token 을 받는 중 문제가 발생하였습니다");
+            throw new KakaoLoginException(HttpStatus.INTERNAL_SERVER_ERROR, ResponseType.ERROR, "Access Token 을 받는 중 문제가 발생하였습니다");
         }
         
         KakaoTokenResponse responseBody = response.getBody();
@@ -97,7 +95,7 @@ public class KakaoLoginService {
         ResponseEntity<KakaoUserInfoResponse> response = restTemplate.exchange(uriComponentsBuilder.toUri(), HttpMethod.GET, request, KakaoUserInfoResponse.class);
 
         if (response.getStatusCode().value() != 200) {
-            throw new KakaoLoginException(response.getStatusCode().value(), "사용자 정보를 받는 중 문제가 발생하였습니다");
+            throw new KakaoLoginException(HttpStatus.INTERNAL_SERVER_ERROR, ResponseType.ERROR, "사용자 정보를 받는 중 문제가 발생하였습니다");
         }
 
         KakaoUserInfoResponse responseBody = response.getBody();
