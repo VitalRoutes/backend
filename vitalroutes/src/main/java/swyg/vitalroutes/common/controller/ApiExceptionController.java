@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import swyg.vitalroutes.common.exception.JwtTokenException;
+import swyg.vitalroutes.common.exception.KakaoLoginException;
 import swyg.vitalroutes.common.exception.MemberSignUpException;
 
 import java.util.Map;
@@ -18,6 +19,11 @@ public class ApiExceptionController {
 
     @ExceptionHandler(JwtTokenException.class)
     public ResponseEntity<?> jwtTokenEx(JwtTokenException exception) {
+        return ResponseEntity.status(exception.getStatusCode()).body(Map.of("error", exception.getMessage()));
+    }
+
+    @ExceptionHandler(KakaoLoginException.class)
+    public ResponseEntity<?> kakaoLoginEx(KakaoLoginException exception) {
         return ResponseEntity.status(exception.getStatusCode()).body(Map.of("error", exception.getMessage()));
     }
 }
