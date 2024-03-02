@@ -1,13 +1,11 @@
 package swyg.vitalroutes.security.utils;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
 import swyg.vitalroutes.common.exception.JwtTokenException;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.security.domain.UserDetailsImpl;
@@ -18,6 +16,9 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
+import static org.springframework.http.HttpStatus.*;
+import static swyg.vitalroutes.common.response.ResponseType.*;
+
 public class JwtTokenProvider {
 
     @Value("${jwt.secretKey}")
@@ -26,9 +27,9 @@ public class JwtTokenProvider {
     // Bearer XXX 형태로 토큰이 전달되는지 체크
     public void checkAuthorizationHeader(String header) {
         if(header == null) {
-            throw new JwtTokenException(400, "토큰이 전달되지 않았습니다");
+            throw new JwtTokenException(BAD_REQUEST, FAIL, "토큰이 전달되지 않았습니다");
         } else if (!header.startsWith(JwtConstants.JWT_TYPE)) {
-            throw new JwtTokenException(400, "올바르지 않은 토큰 형식입니다");
+            throw new JwtTokenException(BAD_REQUEST, FAIL, "올바르지 않은 토큰 형식입니다");
         }
     }
 
@@ -85,9 +86,9 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token) // 파싱 및 검증, 실패 시 에러
                     .getBody();
         } catch(ExpiredJwtException expiredJwtException){
-            throw new JwtTokenException(401, "토큰이 만료되었습니다");
+            throw new JwtTokenException(UNAUTHORIZED, FAIL, "토큰이 만료되었습니다");
         } catch(Exception e){
-            throw new JwtTokenException(400, "토큰이 올바르지 않습니다");
+            throw new JwtTokenException(BAD_REQUEST, FAIL, "올바르지 않은 토큰 형식입니다");
         }
         return claim;
     }
@@ -100,7 +101,7 @@ public class JwtTokenProvider {
         try {
             validateToken(token);
         } catch (JwtTokenException exception) {
-            return (exception.getStatusCode() == 401);
+            return (exception.getStatus() == UNAUTHORIZED);
         }
         return false;
     }

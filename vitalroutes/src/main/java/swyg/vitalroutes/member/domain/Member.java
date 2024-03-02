@@ -42,6 +42,8 @@ public class Member {
         dataMap.put("name", name);
         dataMap.put("nickname", nickname);
         dataMap.put("email", email);
+        dataMap.put("socialId", socialId);
+        dataMap.put("socialType", socialType);
         return dataMap;
     }
 }
