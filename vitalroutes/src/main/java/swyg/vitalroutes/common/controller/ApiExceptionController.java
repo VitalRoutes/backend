@@ -1,15 +1,13 @@
 package swyg.vitalroutes.common.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import swyg.vitalroutes.common.exception.JwtTokenException;
 import swyg.vitalroutes.common.exception.KakaoLoginException;
+import swyg.vitalroutes.common.exception.MemberModifyException;
 import swyg.vitalroutes.common.exception.MemberSignUpException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
 
-import java.util.Map;
 
 @RestControllerAdvice
 public class ApiExceptionController {
@@ -25,6 +23,11 @@ public class ApiExceptionController {
 
     @ExceptionHandler(KakaoLoginException.class)
     public ApiResponseDTO<?> kakaoLoginEx(KakaoLoginException exception) {
+        return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+    }
+
+    @ExceptionHandler(MemberModifyException.class)
+    public ApiResponseDTO<?> memberModifyEx(MemberModifyException exception) {
         return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
     }
 }

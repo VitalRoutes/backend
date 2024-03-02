@@ -11,16 +11,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import swyg.vitalroutes.common.exception.MemberModifyException;
 import swyg.vitalroutes.common.exception.MemberSignUpException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
+import swyg.vitalroutes.member.domain.Member;
+import swyg.vitalroutes.member.domain.MemberModifyDTO;
 import swyg.vitalroutes.member.domain.MemberNicknameDTO;
 import swyg.vitalroutes.member.domain.MemberSaveDTO;
 import swyg.vitalroutes.member.service.MemberService;
 import swyg.vitalroutes.security.domain.SocialMemberDTO;
+import swyg.vitalroutes.security.utils.JwtConstants;
+import swyg.vitalroutes.security.utils.JwtTokenProvider;
 
+
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.*;
 import static swyg.vitalroutes.common.response.ResponseType.*;
@@ -33,6 +40,7 @@ import static swyg.vitalroutes.common.response.ResponseType.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(description = "회원가입 전, 닉네임 중복 확인 시 호출하는 API", summary = "닉네임 중복 확인")
     @ApiResponses(value = {
@@ -125,4 +133,45 @@ public class MemberController {
         }
         return new ApiResponseDTO<>(CREATED, SUCCESS, "회원가입이 완료되었습니다", null);
     }
+
+
+    @GetMapping("/member/profile/{memberId}")
+    public ApiResponseDTO<?> viewMemberInfo(@PathVariable Long memberId) {
+        Optional<Member> optionalMember = memberService.getMemberInfo(memberId);
+        if (optionalMember.isEmpty()) {
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, "존재하지 않는 회원입니다", null);
+        }
+        return new ApiResponseDTO<>(OK, SUCCESS, null, MemberModifyDTO.entityToDto(optionalMember.get()));
+    }
+
+
+    @PatchMapping("/member/profile/{memberId}")
+    public ApiResponseDTO<?> modifyMemberInfo(@PathVariable Long memberId, @RequestBody MemberModifyDTO memberDto) {
+        log.info("memberDto = {}", memberDto);
+        Member member = null;
+        try {
+            member = memberService.modifyMemberInfo(memberId, memberDto);
+        } catch (NoSuchElementException exception) {
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, "존재하지 않는 회원입니다", null);
+        } catch (DataIntegrityViolationException exception) {
+            return new ApiResponseDTO<>(CONFLICT, FAIL, "중복되는 닉네임 혹은 이메일이 존재합니다", null);
+        } catch (MemberModifyException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+        }
+        // 수정 후 사용자 정보를 토큰과 함께 data 에 담아서 전달
+        Map<String, Object> claims = member.getClaims();
+        claims.put("accessToken", jwtTokenProvider.generateToken(claims, JwtConstants.ACCESS_EXP_TIME));
+        claims.put("refreshToken", jwtTokenProvider.generateToken(claims, JwtConstants.REFRESH_EXP_TIME));
+
+        return new ApiResponseDTO<>(OK, SUCCESS, "회원정보 수정이 완료되었습니다", claims);
+    }
+
+    @DeleteMapping("/member/profile/{memberId}")
+    public ApiResponseDTO<?> deleteMember(@PathVariable Long memberId) {
+        memberService.deleteMember(memberId);
+        return new ApiResponseDTO<>(OK, SUCCESS, "회원탈퇴가 완료되었습니다", null);
+    }
+
+
+
 }
