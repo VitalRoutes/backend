@@ -117,4 +117,15 @@ public class MemberService {
         return member;
     }
 
+
+    public Member modifyProfileImage(Long memberId, String imageURL) {
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+        if (optionalMember.isEmpty()) {
+            throw new MemberModifyException(BAD_REQUEST, FAIL, "사용자가 존재하지 않습니다");
+        }
+        Member member = optionalMember.get();
+        member.setProfile(imageURL);
+        return member;
+    }
+
 }

@@ -10,21 +10,23 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import swyg.vitalroutes.common.exception.JwtTokenException;
 import swyg.vitalroutes.common.exception.MemberModifyException;
 import swyg.vitalroutes.common.exception.MemberSignUpException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
-import swyg.vitalroutes.member.domain.Member;
-import swyg.vitalroutes.member.domain.MemberModifyDTO;
-import swyg.vitalroutes.member.domain.MemberNicknameDTO;
-import swyg.vitalroutes.member.domain.MemberSaveDTO;
+import swyg.vitalroutes.member.domain.*;
 import swyg.vitalroutes.member.service.MemberService;
+import swyg.vitalroutes.s3.S3UploadService;
 import swyg.vitalroutes.security.domain.SocialMemberDTO;
 import swyg.vitalroutes.security.utils.JwtConstants;
 import swyg.vitalroutes.security.utils.JwtTokenProvider;
 
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -41,6 +43,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final S3UploadService s3UploadService;
 
     @Operation(description = "회원가입 전, 닉네임 중복 확인 시 호출하는 API", summary = "닉네임 중복 확인")
     @ApiResponses(value = {
@@ -172,6 +175,35 @@ public class MemberController {
         return new ApiResponseDTO<>(OK, SUCCESS, "회원탈퇴가 완료되었습니다", null);
     }
 
+    /**
+     * 프로필 이미지 변경 프로세스
+     * 1. S3 에 이미지를 업로드 하는 API 를 호출한다 -> formData
+     * 2. 프로필 이미지를 수정하는 API 를 호출한다 -> formData
+     */
+    @PostMapping("/member/profile/image")
+    public ApiResponseDTO<?> uploadProfileImage(MemberProfileImageDTO imageDTO) {
+        log.info("imageDTO = {}", imageDTO);
+        String imageURL = "";
+        try {
+            MultipartFile profileImage = imageDTO.getProfileImage();
+            imageURL = s3UploadService.saveFile(profileImage);  // UUID + 원본파일명 형태로 저장됨
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponseDTO<>(INTERNAL_SERVER_ERROR, ERROR, "이미지 업로드 중 에러가 발생하였습니다", null);
+        }
+        return new ApiResponseDTO<>(OK, SUCCESS, "프로필 이미지 업로드가 완료되었습니다", Map.of("imageURL", imageURL));
+    }
+
+    @PatchMapping("/member/profile/image/{memberId}")
+    public ApiResponseDTO<?> modifyProfileImage(@PathVariable Long memberId, MemberProfileImageDTO imageDTO) {
+        log.info("imageDTO = {}", imageDTO);
+        String profileImageURL = imageDTO.getProfileImageURL();
+        if (!StringUtils.hasText(profileImageURL)) {
+            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "프로필 이미지가 전달되지 않았습니다", null);
+        }
+        Member member = memberService.modifyProfileImage(memberId, profileImageURL);
+        return new ApiResponseDTO<>(OK, SUCCESS, "프로필 이미지 수정이 완료되었습니다", MemberModifyDTO.entityToDto(member));
+    }
 
 
 }
