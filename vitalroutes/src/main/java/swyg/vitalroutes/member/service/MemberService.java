@@ -14,6 +14,7 @@ import swyg.vitalroutes.member.domain.SocialType;
 import swyg.vitalroutes.member.repository.MemberRepository;
 import swyg.vitalroutes.security.domain.SocialMemberDTO;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.*;
@@ -60,6 +61,10 @@ public class MemberService {
     }
 
     public void deleteMember(Long memberId) {
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+        if (optionalMember.isEmpty()) {
+            throw new NoSuchElementException();
+        }
         memberRepository.deleteById(memberId);
     }
 
