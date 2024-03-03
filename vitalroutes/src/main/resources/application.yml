@@ -7,6 +7,26 @@ spring:
   thymeleaf:
     cache: false
 
+  # Image File Size
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+
+  # Mail Service
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        debug: true
+        smtp.auth: true
+        smtp.timeout: 50000
+        smtp.starttls.enable: true
+    username: ENC(p5fGOcTWBiKYx1fGmNxj7eN/yiZcao+F3XO9NoEpjFAqrMvMU5QSlw==)
+    password: ENC(L1bCrwxo+b8i+mI7hAi5lhaVQD8rQNzrQjfx/ne53rg=)
+
+
   # spring data jpa ??
   jpa:
       #database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -25,8 +45,8 @@ cloud:
     s3:
       bucket: vital-routes-bucket
     credentials:
-      access-key: ENC(2UXJ1AxBkq3TG2fwyJCs1vLw+/WrHm8AajRtFc2rwlA=)
-      secret-key: ENC(oaAgrjsbeLI9IIbNywgyUKqhytarQldrn6NcS+W/c2xQpVfydNgE+cCoKMxAquR4TRQQ0SPHHd8=)
+      access-key: ENC(u4ltBd8SKMXsj4wlWB4rk4+DyL4Y2MGUYHy/+IxpCY8=)
+      secret-key: ENC(Ym0xw87fc9L+nLjp88P/6gfcDILZYjbcU2R2fcNkZ2ieSEbXKfTEt5Y3jL9d5Tq5rOorHnk7A3A=)
       instanceProfile: true
     region:
       static: ap-northeast-2
