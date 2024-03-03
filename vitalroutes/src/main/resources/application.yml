@@ -7,10 +7,25 @@ spring:
   thymeleaf:
     cache: false
 
+  # Image File Size
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 50MB
+
+  # Mail Service
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        debug: true
+        smtp.auth: true
+        smtp.timeout: 50000
+        smtp.starttls.enable: true
+    username: ENC(p5fGOcTWBiKYx1fGmNxj7eN/yiZcao+F3XO9NoEpjFAqrMvMU5QSlw==)
+    password: ENC(L1bCrwxo+b8i+mI7hAi5lhaVQD8rQNzrQjfx/ne53rg=)
+
 
   # spring data jpa ??
   jpa:

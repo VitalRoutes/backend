@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import swyg.vitalroutes.common.exception.MemberModifyException;
 import swyg.vitalroutes.common.exception.MemberSignUpException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.member.domain.*;
+import swyg.vitalroutes.member.service.MailService;
 import swyg.vitalroutes.member.service.MemberService;
 import swyg.vitalroutes.s3.S3UploadService;
 import swyg.vitalroutes.security.domain.SocialMemberDTO;
@@ -44,6 +46,7 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
     private final S3UploadService s3UploadService;
+    private final MailService mailService;
 
     @Operation(description = "회원가입 전, 닉네임 중복 확인 시 호출하는 API", summary = "닉네임 중복 확인")
     @ApiResponses(value = {
@@ -206,4 +209,53 @@ public class MemberController {
     }
 
 
+    /**
+     * 비밀번호 재설정 메일 프로세스
+     * 1. message body 에 email 을 전달 받는다
+     * 2. email 이 유효하면 해당 주소로 재설정 이메일을 보낸다. 이때 URI 뒤쪽에 식별자 비슷하게 붙는게 하나 있음
+     * 3. 재설정 이메일에 접속한 후에 새로운 비밀번호를 입력해서 전달한다. API 요청 시 뒤에 붙은 식별자도 함께 전달해주어야함
+     */
+    @PostMapping("/member/password")
+    public ApiResponseDTO<?> sendPasswordEmail(@RequestBody MemberEmailDTO emailDTO) {
+        String email = emailDTO.getEmail();
+        log.info("email = {}", email);
+        Optional<Member> optionalMember = memberService.findMemberByEmail(email);
+        if (optionalMember.isEmpty()) {
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, "존재하지 않는 이메일입니다", null);
+        }
+        Member member = optionalMember.get();
+
+        Map<String, Object> memberInfo = new HashMap<>();
+        memberInfo.put("memberId", member.getMemberId());
+        memberInfo.put("email", member.getEmail());
+        String token = jwtTokenProvider.generateToken(memberInfo, 5);  // 재설정 링크는 5분 동안 유효
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("http://localhost:8080/member/password/");    // 프론트 배포 후에 변경 필요
+        sb.append(token);
+        String url = sb.toString();
+
+        // 메일 전송
+        try {
+            mailService.sendEmail(member.getName(), email, url);
+        } catch (MessagingException exception) {
+            return new ApiResponseDTO<>(INTERNAL_SERVER_ERROR, ERROR, "이메일 전송에 실패하였습니다", null);
+        }
+        
+        return new ApiResponseDTO<>(OK, SUCCESS, "비밀번호 재설정 링크가 전송되었습니다", null);
+    }
+
+    @PatchMapping("/member/password/{token}")
+    public ApiResponseDTO<?> modifyPassword(@PathVariable String token, @RequestBody MemberPasswordDTO passwordDTO) {
+        log.info("token = {}", token);
+        log.info("password = {}", passwordDTO.getPassword());
+        try {
+            Map<String, Object> tokenValue = jwtTokenProvider.validateToken(token);
+            Long memberId = Long.valueOf(String.valueOf(tokenValue.get("memberId")));// 어떤 회원 비밀번호를 변경할지 알게 해주는 데이터
+            memberService.modifyPassword(memberId, passwordDTO.getPassword());
+        } catch (JwtTokenException exception) {
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, "올바르지 않은 비밀번호 설정 링크입니다", null);
+        }
+        return new ApiResponseDTO<>(OK, SUCCESS, "비밀번호 변경이 완료되었습니다", null);
+    }
 }

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <img src="https://vital-routes-bucket.s3.ap-northeast-2.amazonaws.com/524e308b-04ca-4a6e-a0c5-1b4df43e8f18-logo.PNG" width="400">
+</div>
+<div>
+    <h3 th:text="${name}">Hi, </h3>
+    <p style="color: gray">비밀번호 재설정 지침은 다음과 같습니다</p>
+</div>
+<hr>
+<div>
+    <div>
+        VitalRoutes 비밀번호 재설정 요청이 접수되었습니다. 이 요청을 하지 않으셨다면 이 이메일은 무시하시면 됩니다.
+        이 요청을 했다면 비밀번호를 재설정하세요
+    </div>
+    <br/>
+    <div>
+        <a th:href="${url}">암호를 재설정</a>
+    </div>
+    <br/>
+    <div>
+        고마워요,
+    </div>
+    <div>
+        팀 vitalRoutes
+    </div>
+</div>
+</body>
+</html>

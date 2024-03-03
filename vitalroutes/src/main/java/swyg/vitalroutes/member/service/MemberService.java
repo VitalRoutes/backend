@@ -128,4 +128,27 @@ public class MemberService {
         return member;
     }
 
+    public Optional<Member> findMemberByEmail(String email) {
+        return memberRepository.findByEmail(email);
+    }
+
+
+    public void modifyPassword(Long memberId, String password) {
+        // 사용자 존재하는지 다시 확인
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+        if (optionalMember.isEmpty()) {
+            throw new MemberModifyException(BAD_REQUEST, FAIL, "사용자가 존재하지 않습니다");
+        }
+
+        // 비밀번호 규칙을 준수하는지 확인
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$";
+        boolean matches = password.matches(regex);
+        if (!matches) {
+            throw new MemberModifyException(BAD_REQUEST, FAIL, "비밀번호는 대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하여야 합니다");
+        }
+
+        Member member = optionalMember.get();
+        member.setPassword(passwordEncoder.encode(password));
+    }
+
 }
