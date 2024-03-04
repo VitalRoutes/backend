@@ -1,7 +1,6 @@
 package swyg.vitalroutes.participation.dto;
 
 import lombok.Data;
-import swyg.vitalroutes.comments.dto.CommentResponseDTO;
 import swyg.vitalroutes.participation.domain.Participation;
 
 import java.time.LocalDateTime;
@@ -18,11 +17,12 @@ public class ParticipationResponseDTO {
     private String timeString;
     
     // 등록된 이미지의 개수
-    private int totalImage;
+    private int totalImages;
     private List<LocationResponseDTO> participationImages;
     
-    // 참여에 대한 댓글( comment )
-    private List<CommentResponseDTO> comments;
+    // 참여에 대한 댓글( comment ) 카운트
+    private long totalComments;
+    // private List<CommentResponseDTO> comments;
 
     public ParticipationResponseDTO(Participation participation) {
         participationId = participation.getParticipationId();
@@ -30,7 +30,7 @@ public class ParticipationResponseDTO {
         nickname = participation.getMember().getNickname();
         content = participation.getContent();
         timeString = calTimeString(participation.getLocalDateTime());
-        totalImage = participation.getLocations().size();
+        totalImages = participation.getLocations().size();
         participationImages = participation.getLocations().stream().map(LocationResponseDTO::new).toList();
     }
 

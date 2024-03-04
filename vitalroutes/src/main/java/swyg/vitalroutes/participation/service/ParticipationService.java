@@ -2,15 +2,13 @@ package swyg.vitalroutes.participation.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import swyg.vitalroutes.comments.domain.Comment;
-import swyg.vitalroutes.comments.dto.CommentResponseDTO;
 import swyg.vitalroutes.comments.repository.CommentRepository;
 import swyg.vitalroutes.common.exception.ParticipationException;
-import swyg.vitalroutes.common.response.ResponseType;
+import swyg.vitalroutes.common.response.DataWithCount;
 import swyg.vitalroutes.common.utils.FileUtils;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.repository.MemberRepository;
@@ -39,17 +37,20 @@ public class ParticipationService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
-    public List<ParticipationResponseDTO> findParticipation(Long boardId) {
-        List<Participation> participations = participationRepository.findAllByBoardId(boardId);
-        List<ParticipationResponseDTO> responseDTO = participations.stream().map(ParticipationResponseDTO::new).toList();
+    public DataWithCount<?> findParticipation(Long boardId, Pageable pageable) {
+        List<Participation> entityList = participationRepository.findAllByBoardId(boardId, pageable);
+        List<ParticipationResponseDTO> dtoList = entityList.stream().map(ParticipationResponseDTO::new).toList();
 
-        for (ParticipationResponseDTO dto : responseDTO) {
-            List<Comment> comments = commentRepository.findAllByParticipationId(dto.getParticipationId());
-            List<CommentResponseDTO> commentDtos = comments.stream().map(CommentResponseDTO::new).toList();
-            dto.setComments(commentDtos);
+        for (ParticipationResponseDTO dto : dtoList) {
+            long size = commentRepository.countByParticipationId(dto.getParticipationId());
+            dto.setTotalComments(size);
         }
 
-        return responseDTO;
+        long count = participationRepository.countAllByBoardId(boardId);
+
+        boolean remainFlag = (pageable.getOffset() * (pageable.getPageNumber() + 1)) < count;  // 현재까지 보여지고 있는 데이터 외에 남은 데이터가 있는지
+
+        return new DataWithCount<>(count, remainFlag, dtoList);
     }
 
 

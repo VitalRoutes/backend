@@ -3,13 +3,14 @@ package swyg.vitalroutes.participation.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import swyg.vitalroutes.common.exception.FileProcessException;
 import swyg.vitalroutes.common.exception.ParticipationException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
-import swyg.vitalroutes.participation.domain.Participation;
-import swyg.vitalroutes.participation.dto.ParticipationResponseDTO;
+import swyg.vitalroutes.common.response.DataWithCount;
 import swyg.vitalroutes.participation.dto.ParticipationSaveDTO;
 import swyg.vitalroutes.participation.service.ParticipationService;
 
@@ -28,13 +29,12 @@ public class ParticipationController {
     private final ParticipationService participationService;
 
     /**
-     * 임시로 만들어놓은 controller ( 해당 API 를 직접 호출할 일이 없음 )
-     * 챌린지에 대한 참여 및 댓글 조회 시 서비스의 메서드 호출
+     * 챌린지( 게시글 )에 대한 챌린지 참여( 참여 게시글 ) 불러오기
      */
     @GetMapping("/view/{boardId}")
-    public ApiResponseDTO<?> viewTest(@PathVariable Long boardId) {
-        List<ParticipationResponseDTO> participation = participationService.findParticipation(boardId);
-        return new ApiResponseDTO<>(OK, SUCCESS, null, participation);
+    public ApiResponseDTO<?> viewAllParticipation(@PathVariable Long boardId, @PageableDefault(size = 5) Pageable pageable) {
+        DataWithCount<?> dataWithCount = participationService.findParticipation(boardId, pageable);
+        return new ApiResponseDTO<>(OK, SUCCESS, null, dataWithCount);
     }
 
     @PostMapping("/save")
