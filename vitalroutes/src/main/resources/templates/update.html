@@ -9,7 +9,6 @@
     <input type="hidden" name="id" th:value="${boardUpdate.id}"> <!-- 사용자에게 보여주지는 않지만 있어야할 정보는 hidden처리 -->
     writer: <input type="text" name="boardWriter" th:value="${boardUpdate.boardWriter}" readonly> <br>
     <!-- 사용자에게 보여주는데 수정을 불가하게할때는 readonly처리 -->
-    pass: <input type="text" name="boardPass" id="boardPass"> <br>
     title: <input type="text" name="boardTitle" th:value="${boardUpdate.boardTitle}"> <br>
     contents: <textarea name="boardContents" cols="30" rows="10" th:text="${boardUpdate.boardContents}"></textarea> <br>
     <input type="hidden" name="boardHits" th:value="${boardUpdate.boardHits}">
