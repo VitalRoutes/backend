@@ -1,8 +1,11 @@
 spring:
   datasource:
-    url: ENC(jO49RGHnkCNy+rqEKuRQ4du128xO/FGprtYMt5NCX0iNdSjOFsbOCY/h/hSWLBPbKUa0zp2gAIFhYBsNShkXCgJw05bgcInPTm47U3/FqH7yBwWuOSVXNzhhmM6CxYTzhMKyPlGjOKo8VDafXIP1qwjM/DtXjLpi)
-    username: ENC(WXJRUma8h4Aa17BMomL3Vw==)
-    password: ENC(ep1lvgJv5L9UAVQJQQW/Zg==)
+    #url: ENC(jO49RGHnkCNy+rqEKuRQ4du128xO/FGprtYMt5NCX0iNdSjOFsbOCY/h/hSWLBPbKUa0zp2gAIFhYBsNShkXCgJw05bgcInPTm47U3/FqH7yBwWuOSVXNzhhmM6CxYTzhMKyPlGjOKo8VDafXIP1qwjM/DtXjLpi)
+    #username: ENC(WXJRUma8h4Aa17BMomL3Vw==)
+    #password: ENC(ep1lvgJv5L9UAVQJQQW/Zg==)
+    url: jdbc:mysql://3.24.175.130:3306/vital_routes_DB?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: joohan
+    password: 1
     driver-class-name: com.mysql.cj.jdbc.Driver
   thymeleaf:
     cache: false
@@ -13,12 +16,19 @@ spring:
     open-in-view: false
     show-sql: true
     hibernate:
-      ddl-auto: none # ?? ?? ? update? ????? data? ??? ? ??.
-        #ddl-auto: update
-
+      ddl-auto: create # 최초 생성 후 update로 바꿔주는게 data를 보호할 수 있다.
+      #ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      use-new-id-generator-mappings: false
     properties:
       hibernate.format_sql: true
       dialect: org.hibernate.dialect.MySQL8InnoDBDialect
+
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
 
 cloud:
   aws:
@@ -42,3 +52,5 @@ kakao:
   login:
     client-id: ENC(DINFbAY/RI0maEuCPDXuQcCQNp4+CxtI7O+wFoDI1ohNpHMAWvKNo71lDMLPaAy3)
     redirect-uri: ENC(io/BNG3FIRVo5Elr8qJvP26KazkACWMxO9keK11My/JZZ1jUrvAcvHwAIhuV1j+J)
+    #redirect-uri: http://localhost:8080/kakaologin
+    #redirect-uri: http://localhost:8080/oauth2/kakao
