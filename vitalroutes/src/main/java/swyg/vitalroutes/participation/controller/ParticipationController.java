@@ -29,13 +29,12 @@ public class ParticipationController {
 
     /**
      * 임시로 만들어놓은 controller ( 해당 API 를 직접 호출할 일이 없음 )
-     * 쓰게 된다면 DTO 로 변환하는 로직을 서비스로 이동
+     * 챌린지에 대한 참여 및 댓글 조회 시 서비스의 메서드 호출
      */
     @GetMapping("/view/{boardId}")
     public ApiResponseDTO<?> viewTest(@PathVariable Long boardId) {
-        List<Participation> participations = participationService.findParticipation(boardId);
-        List<ParticipationResponseDTO> responseDTO = participations.stream().map(ParticipationResponseDTO::new).toList();
-        return new ApiResponseDTO<>(OK, SUCCESS, null, responseDTO);
+        List<ParticipationResponseDTO> participation = participationService.findParticipation(boardId);
+        return new ApiResponseDTO<>(OK, SUCCESS, null, participation);
     }
 
     @PostMapping("/save")
@@ -43,9 +42,9 @@ public class ParticipationController {
         if (bindingResult.hasErrors()) {
             return new ApiResponseDTO<>(BAD_REQUEST, FAIL, bindingResult.getFieldError().getDefaultMessage(), null);
         }
-        Participation participation = null;
+
         try {
-            participation = participationService.saveParticipation(saveDTO);
+            participationService.saveParticipation(saveDTO);
         } catch (FileProcessException exception) {
             return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         } catch (ParticipationException exception) {

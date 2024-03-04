@@ -1,6 +1,7 @@
 package swyg.vitalroutes.participation.dto;
 
 import lombok.Data;
+import swyg.vitalroutes.comments.dto.CommentResponseDTO;
 import swyg.vitalroutes.participation.domain.Participation;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.List;
 @Data
 public class ParticipationResponseDTO {
     private Long participationId;
+    private String memberProfile;
     private String nickname;
     private String content;
     private String timeString;
@@ -19,15 +21,17 @@ public class ParticipationResponseDTO {
     private int totalImage;
     private List<LocationResponseDTO> participationImages;
     
-    // 댓글(comment) DTO 도 추가 필요 ( 참여에 대한 댓글 )
+    // 참여에 대한 댓글( comment )
+    private List<CommentResponseDTO> comments;
 
     public ParticipationResponseDTO(Participation participation) {
         participationId = participation.getParticipationId();
+        memberProfile = participation.getMember().getProfile();
         nickname = participation.getMember().getNickname();
         content = participation.getContent();
         timeString = calTimeString(participation.getLocalDateTime());
         totalImage = participation.getLocations().size();
-        participationImages = participation.getLocations().stream().map(location -> new LocationResponseDTO(location)).toList();
+        participationImages = participation.getLocations().stream().map(LocationResponseDTO::new).toList();
     }
 
     public static String calTimeString(LocalDateTime localDateTime) {

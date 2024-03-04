@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import swyg.vitalroutes.comments.domain.Comment;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.post.entity.BoardEntity;
 
@@ -42,12 +43,14 @@ public class Participation {
      * Repository 에서 @EntityGraph 로 함께 조회 가능
      */
     @ElementCollection
+    @OrderBy("sequence asc")    // 사진 순서에 따른 오름차순 정렬
     private List<Location> locations = new ArrayList<>();
 
     /**
-     * Comment 와 연관관계 설정 필요, Comment 는 엔티티이기 때문에 연관관계 세팅이 필요함
+     * Participation 과 Comment 의 연관관계는 Comment 를 생성할 때 설정
      */
-    
+    @OneToMany(mappedBy = "participation", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
     
 
     public void setParticipationInBoard(BoardEntity board) {
