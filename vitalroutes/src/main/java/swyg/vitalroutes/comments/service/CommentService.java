@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import swyg.vitalroutes.comments.domain.Comment;
+import swyg.vitalroutes.comments.dto.CommentModifyDTO;
 import swyg.vitalroutes.comments.dto.CommentSaveDTO;
 import swyg.vitalroutes.comments.repository.CommentRepository;
 import swyg.vitalroutes.common.exception.CommentException;
@@ -27,11 +28,23 @@ public class CommentService {
 
     public void saveComment(CommentSaveDTO saveDTO) {
         Member member = memberRepository.findById(saveDTO.getMemberId())
-                .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "사용자 ID 가 잘못되었습니다"));
+                .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "사용자가 존재하지 않습니다"));
         Participation participation = participationRepository.findById(saveDTO.getParticipationId())
                 .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "챌린지 참여가 존재하지 않습니다"));
 
         Comment comment = Comment.createComment(saveDTO.getContent(), member, participation);
         commentRepository.save(comment);
+    }
+
+    public void modifyComment(Long commentId, CommentModifyDTO modifyDTO) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "댓글이 존재하지 않습니다"));
+        comment.setContent(modifyDTO.getContent());
+    }
+
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "댓글이 존재하지 않습니다"));
+        commentRepository.deleteById(commentId);
     }
 }

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import swyg.vitalroutes.comments.dto.CommentModifyDTO;
 import swyg.vitalroutes.comments.dto.CommentSaveDTO;
 import swyg.vitalroutes.comments.service.CommentService;
 import swyg.vitalroutes.common.exception.CommentException;
@@ -35,5 +36,29 @@ public class CommentController {
             return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         }
         return new ApiResponseDTO<>(OK, SUCCESS, "댓글 작성이 완료되었습니다", null);
+    }
+
+    @PatchMapping("/{commentId}")
+    public ApiResponseDTO<?> modifyComment(@PathVariable Long commentId, @Valid @RequestBody CommentModifyDTO modifyDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, bindingResult.getFieldError().getDefaultMessage(), null);
+        }
+
+        try {
+            commentService.modifyComment(commentId, modifyDTO);
+        } catch (CommentException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+        }
+        return new ApiResponseDTO<>(OK, SUCCESS, "댓글 수정이 완료되었습니다", null);
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ApiResponseDTO<?> deleteComment(@PathVariable Long commentId) {
+        try {
+            commentService.deleteComment(commentId);
+        } catch (CommentException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+        }
+        return new ApiResponseDTO<>(OK, SUCCESS, "댓글이 삭제되었습니다", null);
     }
 }
