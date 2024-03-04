@@ -53,4 +53,14 @@ public class ParticipationController {
         return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 참여가 완료되었습니다", null);
     }
 
+    @DeleteMapping("/{participationId}")
+    public ApiResponseDTO<?> deleteParticipation(@PathVariable Long participationId) {
+        try {
+            participationService.deleteParticipation(participationId);
+        } catch (ParticipationException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+        }
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 참여 게시글이 삭제되었습니다", null);
+    }
+
 }

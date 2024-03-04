@@ -65,7 +65,7 @@ public class ParticipationService {
         }
 
         Member member = memberRepository.findById(saveDTO.getMemberId())
-                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "사용자 ID 가 잘못되었습니다"));
+                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "사용자가 존재하지 않습니다"));
         BoardEntity board = boardRepository.findById(saveDTO.getBoardId())
                 .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "게시글이 존재하지 않습니다"));
 
@@ -76,5 +76,11 @@ public class ParticipationService {
 
         Participation participation = Participation.createParticipation(saveDTO.getContent(), member, board, locations);
         participationRepository.save(participation);
+    }
+
+    public void deleteParticipation(Long participationId) {
+        Participation participation = participationRepository.findById(participationId)
+                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "참여 게시글이 존재하지 않습니다"));
+        participationRepository.deleteById(participationId);
     }
 }
