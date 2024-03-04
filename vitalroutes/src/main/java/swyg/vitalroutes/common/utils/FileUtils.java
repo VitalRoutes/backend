@@ -34,9 +34,9 @@ public class FileUtils {
         return convFile;
     }
 
-    public static String[] getLocationInfo(MultipartFile multipartFile) {
-        String latitude = "";
-        String longitude = "";
+    public static double[] getLocationInfo(MultipartFile multipartFile) {
+        double latitude = 0.0;
+        double longitude = 0.0;
         try {
             File file = multipartFileToFile(multipartFile);
             Metadata metadata = ImageMetadataReader.readMetadata(file);
@@ -47,8 +47,8 @@ public class FileUtils {
             }
 
             if (gpsDirectory.containsTag(GpsDirectory.TAG_LATITUDE) && gpsDirectory.containsTag(GpsDirectory.TAG_LONGITUDE)) {
-                latitude = String.valueOf(gpsDirectory.getGeoLocation().getLatitude()); // 위도
-                longitude = String.valueOf(gpsDirectory.getGeoLocation().getLongitude());    // 경도
+                latitude = gpsDirectory.getGeoLocation().getLatitude(); // 위도
+                longitude = gpsDirectory.getGeoLocation().getLongitude();    // 경도
             }
 
             if (file.exists()) {
@@ -66,6 +66,6 @@ public class FileUtils {
         } catch (ImageProcessingException e) {
             throw new FileProcessException(INTERNAL_SERVER_ERROR, ERROR, "이미지 정보를 읽을 수 없습니다");
         }
-        return new String[]{latitude, longitude};
+        return new double[]{latitude, longitude};
     }
 }

@@ -10,10 +10,10 @@ import lombok.Setter;
 public class Location {
     private int sequence;
     private String fileName;
-    private String latitude;
-    private String longitude;
+    private double latitude;
+    private double longitude;
 
-    public static Location createLocation(int seq, String fileName, String[] info) {
+    public static Location createLocation(int seq, String fileName, double[] info) {
         Location location = new Location();
         location.setSequence(seq);
         location.setFileName(fileName);

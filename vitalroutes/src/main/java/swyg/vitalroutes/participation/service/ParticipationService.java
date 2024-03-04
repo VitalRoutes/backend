@@ -61,7 +61,7 @@ public class ParticipationService {
         for (MultipartFile file : files) {
             String fileName = "file image url";
             // String fileName = s3UploadService.saveFile(file);
-            String[] locationInfo = FileUtils.getLocationInfo(file);
+            double[] locationInfo = FileUtils.getLocationInfo(file);
             locations.add(Location.createLocation(++seq, fileName, locationInfo));
         }
 
