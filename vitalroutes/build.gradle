@@ -36,6 +36,8 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'	// Swagger SpringDoc
 
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'	// yml 암호화 jasypt 라이브러리
+
+	implementation 'org.springframework.boot:spring-boot-starter-mail'	// 이메일 라이브러리
 	
 
 	// JJWT

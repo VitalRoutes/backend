@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,11 @@ public class S3UploadService {
     private String bucket;
 
     public String saveFile(MultipartFile multipartFile) throws IOException {
-        String originalFilename = multipartFile.getOriginalFilename();
+        StringBuffer sb = new StringBuffer();
+        sb.append(UUID.randomUUID());
+        sb.append("-");
+        sb.append(multipartFile.getOriginalFilename());
+        String originalFilename = sb.toString();
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
