@@ -1,5 +1,6 @@
 package swyg.vitalroutes.post.controller;
 
+import com.drew.imaging.ImageProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,18 +21,26 @@ public class BoardController {
     private final BoardService boardService; // 생성자 주입방식으로 의존성 주입받음
     @GetMapping("/save") // 자식 주소 매핑
     public String saveForm() {
-        //System.out.println("\n============\nsave.html로 이동\n============\n");
+        System.out.println("\n============\nsave.html로 이동\n============\n");
         return "save"; // save.html 반환 (게시글 저장 페이지)
     }
 
     @PostMapping("/save") // 클라이언트로부터 post로 /save주소로 요청을 받음
-    public String save(@ModelAttribute BoardDTO boardDTO) throws IOException { // html에서 Controller로 전달해줄 때, 가장 간단한 방법은 @RequestParam() 방법이 있다. 여기서는 대신 @ModelAttribute 사용
+    public String save(@ModelAttribute BoardDTO boardDTO) throws IOException, ImageProcessingException { // html에서 Controller로 전달해줄 때, 가장 간단한 방법은 @RequestParam() 방법이 있다. 여기서는 대신 @ModelAttribute 사용
         // @ModelAttribute에 의해 BoardDTO boardDTO클래스 객체를 찾아서
         // save.html의 name들과 BoardDTO의 필드값이 동일하다면 Spring이 해당하는 필드에 대한 Setter호출해 html에 담긴값을 Setter method에 알아서 담아줌
-        //System.out.println("\n============\nindex.html로 이동\n============\n");
+        System.out.println("\n============\nindex.html로 이동\n============\n");
         System.out.println("boardDTO = " + boardDTO); // 들어온 값 확인
         boardService.save(boardDTO);
-        return "index";
+        System.out.println("\n============\n");
+        System.out.println("대표사진 : " + boardDTO.getBoardFile());
+        //System.out.println("출발지 : " + boardDTO.getBoardStartingPositionStoredFileName());
+        //System.out.println("경유지1 : " + boardDTO.getBoardFileStopOver1StoredFileName());
+        //System.out.println("경유지2 : " + boardDTO.getBoardFileStopOver2StoredFileName());
+        //System.out.println("경유지3 : " + boardDTO.getBoardFileStopOver3StoredFileName());
+        //System.out.println("도착지 : " + boardDTO.getBoardFileDestinationStoredFileName());
+        System.out.println("\n============\n");
+        return "list";
     }
 
     @GetMapping("/")
