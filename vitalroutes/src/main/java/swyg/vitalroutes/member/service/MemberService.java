@@ -8,11 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import swyg.vitalroutes.common.exception.MemberModifyException;
 import swyg.vitalroutes.member.domain.Member;
-import swyg.vitalroutes.member.domain.MemberModifyDTO;
-import swyg.vitalroutes.member.domain.MemberSaveDTO;
+import swyg.vitalroutes.member.dto.MemberModifyDTO;
+import swyg.vitalroutes.member.dto.MemberSaveDTO;
 import swyg.vitalroutes.member.domain.SocialType;
 import swyg.vitalroutes.member.repository.MemberRepository;
-import swyg.vitalroutes.security.domain.SocialMemberDTO;
+import swyg.vitalroutes.security.dto.SocialMemberDTO;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;

@@ -3,7 +3,6 @@ package swyg.vitalroutes.security.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import swyg.vitalroutes.common.exception.JwtTokenException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
-import swyg.vitalroutes.security.domain.RefreshTokenDTO;
+import swyg.vitalroutes.security.dto.RefreshTokenDTO;
 import swyg.vitalroutes.security.utils.JwtConstants;
 import swyg.vitalroutes.security.utils.JwtTokenProvider;
 
