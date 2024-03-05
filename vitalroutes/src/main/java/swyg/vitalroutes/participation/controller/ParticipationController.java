@@ -63,7 +63,12 @@ public class ParticipationController {
 
     @GetMapping("/{participationId}")
     public ApiResponseDTO<?> viewParticipationById(@PathVariable Long participationId) {
-        ParticipationResponseDTO participationResponseDTO = participationService.findById(participationId);
+        ParticipationResponseDTO participationResponseDTO = null;
+        try {
+            participationResponseDTO = participationService.findById(participationId);
+        } catch (ParticipationException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+        }
         return new ApiResponseDTO<>(OK, SUCCESS, null, participationResponseDTO);
     }
 
