@@ -39,12 +39,12 @@ public class Participation {
 
     /**
      * @Element 컬렉션 사용으로 @ManyToOne 사용 X
-     * 내장 타입( Location )으로 인해 연관관계 세팅 필요 없음
+     * 내장 타입( ParticipationImage )으로 인해 연관관계 세팅 필요 없음
      * Repository 에서 @EntityGraph 로 함께 조회 가능
      */
     @ElementCollection
     @OrderBy("sequence asc")    // 사진 순서에 따른 오름차순 정렬
-    private List<Location> locations = new ArrayList<>();
+    private List<ParticipationImage> participationImages = new ArrayList<>();
 
     /**
      * Participation 과 Comment 의 연관관계는 Comment 를 생성할 때 설정
@@ -58,14 +58,14 @@ public class Participation {
         this.board = board;
     }
 
-    public static Participation createParticipation(String content, Member member, BoardEntity board, List<Location> locations) {
+    public static Participation createParticipation(String content, Member member, BoardEntity board, List<ParticipationImage> participationImages) {
         Participation participation = new Participation();
         participation.setContent(content);
         participation.setLocalDateTime(LocalDateTime.now());
         // 연관관계 세팅
         participation.setMember(member);
         participation.setParticipationInBoard(board);
-        participation.setLocations(locations);
+        participation.setParticipationImages(participationImages);
         return participation;
     }
 }

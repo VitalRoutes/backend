@@ -18,11 +18,10 @@ public class ParticipationResponseDTO {
     
     // 등록된 이미지의 개수
     private int totalImages;
-    private List<LocationResponseDTO> participationImages;
+    private List<ImageResponseDTO> participationImages;
     
     // 참여에 대한 댓글( comment ) 카운트
     private long totalComments;
-    // private List<CommentResponseDTO> comments;
 
     public ParticipationResponseDTO(Participation participation) {
         participationId = participation.getParticipationId();
@@ -30,8 +29,8 @@ public class ParticipationResponseDTO {
         nickname = participation.getMember().getNickname();
         content = participation.getContent();
         timeString = calTimeString(participation.getLocalDateTime());
-        totalImages = participation.getLocations().size();
-        participationImages = participation.getLocations().stream().map(LocationResponseDTO::new).toList();
+        totalImages = participation.getParticipationImages().size();
+        participationImages = participation.getParticipationImages().stream().map(ImageResponseDTO::new).toList();
     }
 
     public static String calTimeString(LocalDateTime localDateTime) {

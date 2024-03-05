@@ -12,13 +12,13 @@ import swyg.vitalroutes.common.response.DataWithCount;
 import swyg.vitalroutes.common.utils.FileUtils;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.repository.MemberRepository;
-import swyg.vitalroutes.participation.domain.Location;
+import swyg.vitalroutes.participation.domain.ParticipationImage;
 import swyg.vitalroutes.participation.domain.Participation;
-import swyg.vitalroutes.participation.dto.ParticipationResponseDTO;
-import swyg.vitalroutes.participation.dto.ParticipationSaveDTO;
+import swyg.vitalroutes.participation.dto.*;
 import swyg.vitalroutes.participation.repository.ParticipationRepository;
 import swyg.vitalroutes.post.entity.BoardEntity;
 import swyg.vitalroutes.post.repository.BoardRepository;
+import swyg.vitalroutes.s3.S3UploadService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,7 @@ public class ParticipationService {
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final S3UploadService s3UploadService;
 
     public DataWithCount<?> findParticipation(Long boardId, Pageable pageable) {
         List<Participation> entityList = participationRepository.findAllByBoardId(boardId, pageable);
@@ -55,14 +56,19 @@ public class ParticipationService {
 
 
     public void saveParticipation(ParticipationSaveDTO saveDTO) {
-        List<Location> locations = new ArrayList<>();
+        List<ParticipationImage> participationImages = new ArrayList<>();
         List<MultipartFile> files = saveDTO.getFiles();
         int seq = 0;
+
+        /**
+         * 아래 반복문 안에서 Board 의 Location 과 비교 필요
+         */
+        
         for (MultipartFile file : files) {
             String fileName = "file image url";
             // String fileName = s3UploadService.saveFile(file);
             double[] locationInfo = FileUtils.getLocationInfo(file);
-            locations.add(Location.createLocation(++seq, fileName, locationInfo));
+            participationImages.add(ParticipationImage.createParticipationImage(++seq, fileName));
         }
 
         Member member = memberRepository.findById(saveDTO.getMemberId())
@@ -71,11 +77,9 @@ public class ParticipationService {
                 .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "게시글이 존재하지 않습니다"));
 
 
-        /**
-         * 여기서 Board 의 Location 과 비교 필요
-         */
+        
 
-        Participation participation = Participation.createParticipation(saveDTO.getContent(), member, board, locations);
+        Participation participation = Participation.createParticipation(saveDTO.getContent(), member, board, participationImages);
         participationRepository.save(participation);
     }
 
@@ -83,5 +87,51 @@ public class ParticipationService {
         Participation participation = participationRepository.findById(participationId)
                 .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "참여 게시글이 존재하지 않습니다"));
         participationRepository.deleteById(participationId);
+    }
+
+    public ParticipationResponseDTO findById(Long participationId) {
+        Participation participation = participationRepository.findById(participationId)
+                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "참여 게시글이 존재하지 않습니다"));
+        return new ParticipationResponseDTO(participation);
+    }
+
+    /**
+     * 이미지 변경 2가지 선택지
+     * 1. 변경할 이미지를 업로드한다
+     * 2. 변경할 이미지 없이 내용만 변경된다면 내용을 변경하는 API 를 호출한다
+     */
+    public ImageResponseDTO uploadImage(ImageSaveDTO imageDTO) {
+        String url = "modifyURL";
+        MultipartFile file = imageDTO.getFile();
+        double[] locationInfo = FileUtils.getLocationInfo(file);
+
+        /**
+         * 여기서 Board 이미지의 위치정보와 비교
+         * 위치정보가 유사하다면 OK
+         */
+        Long boardId = imageDTO.getBoardId();
+        int sequence = imageDTO.getSequence();
+
+        /*
+        try {
+            url = s3UploadService.saveFile(file);
+        } catch (IOException exception) {
+            throw new ParticipationException(INTERNAL_SERVER_ERROR, FAIL, "파일 업로드 중 에러가 발생하였습니다");
+        }
+        */
+        return new ImageResponseDTO(sequence, url);
+    }
+
+    public void modifyParticipation(Long participationId, ParticipationModifyDTO modifyDTO) {
+        Participation participation = participationRepository.findById(participationId)
+                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "참여 게시글이 존재하지 않습니다"));
+        participation.setContent(modifyDTO.getContent());
+        // 파일 변경
+
+        List<ParticipationImage> newImages = modifyDTO.getUploadedFiles().stream()
+                .map(imageResponseDTO -> ParticipationImage
+                        .createParticipationImage(imageResponseDTO.getSequence(), imageResponseDTO.getFileName()))
+                .toList();
+        participation.setParticipationImages(newImages);
     }
 }

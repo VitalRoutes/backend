@@ -10,7 +10,7 @@ import swyg.vitalroutes.participation.domain.Participation;
 import java.util.List;
 
 public interface ParticipationRepository extends JpaRepository<Participation, Long> {
-    @EntityGraph(attributePaths = "locations")
+    @EntityGraph(attributePaths = "participationImages")
     @Query("select p from Participation p join fetch p.member where p.board.id = :boardId")
     List<Participation> findAllByBoardId(@Param("boardId") Long boardId, Pageable pageable);
 

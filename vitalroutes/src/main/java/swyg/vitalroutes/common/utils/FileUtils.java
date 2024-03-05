@@ -68,4 +68,28 @@ public class FileUtils {
         }
         return new double[]{latitude, longitude};
     }
+
+    public static double calDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
+        double theta = longitude1 - longitude2;
+        double dist = Math.sin(deg2rad(latitude1)) * Math.sin(deg2rad(latitude2))
+                + Math.cos(deg2rad(latitude1)) * Math.cos(deg2rad(latitude2)) * Math.cos(deg2rad(theta));
+
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515 * 1609.344;
+
+        log.info("dist = {}", dist);
+
+        return dist;
+    }
+
+    // This function converts decimal degrees to radians
+    private static double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    // This function converts radians to decimal degrees
+    private static double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
+    }
 }

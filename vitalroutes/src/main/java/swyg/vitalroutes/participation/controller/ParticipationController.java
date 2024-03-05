@@ -11,11 +11,8 @@ import swyg.vitalroutes.common.exception.FileProcessException;
 import swyg.vitalroutes.common.exception.ParticipationException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.common.response.DataWithCount;
-import swyg.vitalroutes.participation.dto.ParticipationSaveDTO;
+import swyg.vitalroutes.participation.dto.*;
 import swyg.vitalroutes.participation.service.ParticipationService;
-
-
-import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
 import static swyg.vitalroutes.common.response.ResponseType.*;
@@ -61,6 +58,39 @@ public class ParticipationController {
             return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         }
         return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 참여 게시글이 삭제되었습니다", null);
+    }
+
+
+    @GetMapping("/{participationId}")
+    public ApiResponseDTO<?> viewParticipationById(@PathVariable Long participationId) {
+        ParticipationResponseDTO participationResponseDTO = participationService.findById(participationId);
+        return new ApiResponseDTO<>(OK, SUCCESS, null, participationResponseDTO);
+    }
+
+    /**
+     * 참여 이미지를 변경하는 경우 호출되는 API
+     * sequence 와 fileURL 이 반환
+     */
+    @PostMapping("/image")
+    public ApiResponseDTO<?> uploadImage(ImageSaveDTO imageDTO) {
+        ImageResponseDTO imageResponseDTO = null;
+        try {
+            imageResponseDTO = participationService.uploadImage(imageDTO);
+        } catch (ParticipationException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+        }
+        return new ApiResponseDTO<>(OK, SUCCESS, "이미지가 업로드 되었습니다", imageResponseDTO);
+    }
+
+    @PatchMapping("/{participationId}")
+    public ApiResponseDTO<?> modifyParticipation(@PathVariable Long participationId,
+                                                 @Valid @RequestBody ParticipationModifyDTO modifyDTO,
+                                                 BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, bindingResult.getFieldError().getDefaultMessage(), null);
+        }
+        participationService.modifyParticipation(participationId, modifyDTO);
+        return new ApiResponseDTO<>(OK, SUCCESS, "수정되었습니다", null);
     }
 
 }
