@@ -1,9 +1,11 @@
 package swyg.vitalroutes.comments.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+@Schema(description = "챌린지 참여의 댓글을 저장할 때 사용")
 @Data
 public class CommentSaveDTO {
     private Long participationId;

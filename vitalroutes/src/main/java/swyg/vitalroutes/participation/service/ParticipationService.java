@@ -72,12 +72,10 @@ public class ParticipationService {
         }
 
         Member member = memberRepository.findById(saveDTO.getMemberId())
-                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "사용자가 존재하지 않습니다"));
+                .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "사용자가 존재하지 않습니다"));
         BoardEntity board = boardRepository.findById(saveDTO.getBoardId())
-                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "게시글이 존재하지 않습니다"));
+                .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "게시글이 존재하지 않습니다"));
 
-
-        
 
         Participation participation = Participation.createParticipation(saveDTO.getContent(), member, board, participationImages);
         participationRepository.save(participation);
@@ -85,13 +83,13 @@ public class ParticipationService {
 
     public void deleteParticipation(Long participationId) {
         Participation participation = participationRepository.findById(participationId)
-                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "참여 게시글이 존재하지 않습니다"));
+                .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "참여 게시글이 존재하지 않습니다"));
         participationRepository.deleteById(participationId);
     }
 
     public ParticipationResponseDTO findById(Long participationId) {
         Participation participation = participationRepository.findById(participationId)
-                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "참여 게시글이 존재하지 않습니다"));
+                .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "참여 게시글이 존재하지 않습니다"));
         return new ParticipationResponseDTO(participation);
     }
 
@@ -124,7 +122,7 @@ public class ParticipationService {
 
     public void modifyParticipation(Long participationId, ParticipationModifyDTO modifyDTO) {
         Participation participation = participationRepository.findById(participationId)
-                .orElseThrow(() -> new ParticipationException(BAD_REQUEST, FAIL, "참여 게시글이 존재하지 않습니다"));
+                .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "참여 게시글이 존재하지 않습니다"));
         participation.setContent(modifyDTO.getContent());
         // 파일 변경
 

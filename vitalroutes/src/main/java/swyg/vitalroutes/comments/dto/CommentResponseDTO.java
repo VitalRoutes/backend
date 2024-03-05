@@ -1,5 +1,6 @@
 package swyg.vitalroutes.comments.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import swyg.vitalroutes.comments.domain.Comment;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+@Schema(description = "챌린지 참여의 댓글 조회 시 반환되는 데이터")
 @Data
 public class CommentResponseDTO {
     private Long commentId;

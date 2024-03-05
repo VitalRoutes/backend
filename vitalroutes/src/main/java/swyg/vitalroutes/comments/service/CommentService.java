@@ -20,6 +20,7 @@ import swyg.vitalroutes.participation.repository.ParticipationRepository;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static swyg.vitalroutes.common.response.ResponseType.FAIL;
 
 @Slf4j
@@ -46,9 +47,9 @@ public class CommentService {
 
     public void saveComment(CommentSaveDTO saveDTO) {
         Member member = memberRepository.findById(saveDTO.getMemberId())
-                .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "사용자가 존재하지 않습니다"));
+                .orElseThrow(() -> new CommentException(NOT_FOUND, FAIL, "사용자가 존재하지 않습니다"));
         Participation participation = participationRepository.findById(saveDTO.getParticipationId())
-                .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "챌린지 참여가 존재하지 않습니다"));
+                .orElseThrow(() -> new CommentException(NOT_FOUND, FAIL, "챌린지 참여가 존재하지 않습니다"));
 
         Comment comment = Comment.createComment(saveDTO.getContent(), member, participation);
         commentRepository.save(comment);
@@ -56,13 +57,13 @@ public class CommentService {
 
     public void modifyComment(Long commentId, CommentModifyDTO modifyDTO) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "댓글이 존재하지 않습니다"));
+                .orElseThrow(() -> new CommentException(NOT_FOUND, FAIL, "댓글이 존재하지 않습니다"));
         comment.setContent(modifyDTO.getContent());
     }
 
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentException(BAD_REQUEST, FAIL, "댓글이 존재하지 않습니다"));
+                .orElseThrow(() -> new CommentException(NOT_FOUND, FAIL, "댓글이 존재하지 않습니다"));
         commentRepository.deleteById(commentId);
     }
 }
