@@ -2,6 +2,7 @@ package swyg.vitalroutes.comments.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,16 +33,15 @@ public class CommentService {
     private final ParticipationRepository participationRepository;
     private final MemberRepository memberRepository;
 
+
     public DataWithCount<?> viewComments(Long participationId, Pageable pageable) {
-        log.info("page = {}", pageable.getPageNumber());
-        log.info("size = {}", pageable.getOffset());
-        List<Comment> entityList = commentRepository.findAllByParticipationId(participationId, pageable);
-        List<CommentResponseDTO> dtoList = entityList.stream().map(CommentResponseDTO::new).toList();
-        long count = commentRepository.countByParticipationId(participationId);
+        Page<Comment> pagingData = commentRepository.findAllByParticipationId(participationId, pageable);
+        Page<CommentResponseDTO> pagingDTO = pagingData.map(CommentResponseDTO::new);
 
-        boolean remainFlag = (pageable.getOffset() * (pageable.getPageNumber() + 1)) < count;  // 현재까지 보여지고 있는 데이터 외에 남은 데이터가 있는지
+        long count = pagingData.getTotalElements();
+        boolean remainFlag = pagingData.hasNext();
 
-        return new DataWithCount<>(count, remainFlag, dtoList);
+        return new DataWithCount<>(count, remainFlag, pagingDTO.getContent());
     }
 
 

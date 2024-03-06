@@ -2,6 +2,7 @@ package swyg.vitalroutes.participation.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,18 +39,18 @@ public class ParticipationService {
     private final CommentRepository commentRepository;
     private final S3UploadService s3UploadService;
 
+
     public DataWithCount<?> findParticipation(Long boardId, Pageable pageable) {
-        List<Participation> entityList = participationRepository.findAllByBoardId(boardId, pageable);
-        List<ParticipationResponseDTO> dtoList = entityList.stream().map(ParticipationResponseDTO::new).toList();
+        Page<Participation> pagingData = participationRepository.findAllByBoardId(boardId, pageable);
+        List<ParticipationResponseDTO> dtoList = pagingData.map(ParticipationResponseDTO::new).toList();
 
         for (ParticipationResponseDTO dto : dtoList) {
             long size = commentRepository.countByParticipationId(dto.getParticipationId());
             dto.setTotalComments(size);
         }
 
-        long count = participationRepository.countAllByBoardId(boardId);
-
-        boolean remainFlag = (pageable.getOffset() * (pageable.getPageNumber() + 1)) < count;  // 현재까지 보여지고 있는 데이터 외에 남은 데이터가 있는지
+        long count = pagingData.getTotalElements(); // 총 데이터의 수
+        boolean remainFlag = pagingData.hasNext();  // 현재까지 보여지고 있는 데이터 외에 남은 데이터가 있는지
 
         return new DataWithCount<>(count, remainFlag, dtoList);
     }
