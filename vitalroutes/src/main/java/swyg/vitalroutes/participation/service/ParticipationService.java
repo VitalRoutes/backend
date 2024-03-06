@@ -131,6 +131,9 @@ public class ParticipationService {
                 .map(imageResponseDTO -> ParticipationImage
                         .createParticipationImage(imageResponseDTO.getSequence(), imageResponseDTO.getFileName()))
                 .toList();
-        participation.setParticipationImages(newImages);
+        participation.getParticipationImages().clear();
+        for (ParticipationImage newImage : newImages) {
+            participation.getParticipationImages().add(newImage);
+        }
     }
 }

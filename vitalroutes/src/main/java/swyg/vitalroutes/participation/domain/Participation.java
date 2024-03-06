@@ -51,10 +51,10 @@ public class Participation {
      */
     @OneToMany(mappedBy = "participation", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
-    
+
 
     public void setParticipationInBoard(BoardEntity board) {
-        // board.getParticipation().add(this);  // BoardEntity 에 List 구현 필요
+        // board.getParticipationList().add(this);  // BoardEntity 에 List 구현 필요
         this.board = board;
     }
 
@@ -65,7 +65,9 @@ public class Participation {
         // 연관관계 세팅
         participation.setMember(member);
         participation.setParticipationInBoard(board);
-        participation.setParticipationImages(participationImages);
+        for (ParticipationImage participationImage : participationImages) {
+            participation.getParticipationImages().add(participationImage);
+        }
         return participation;
     }
 }
