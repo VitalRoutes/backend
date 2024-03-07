@@ -3,6 +3,7 @@ package swyg.vitalroutes.post.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 import swyg.vitalroutes.post.dto.BoardDTO;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class BoardFileEntity {
 
     @Column
     private int fileAttached;
-    // 사작 위치 : 1, 경유지1 : 2, 경유지2 : 3, 경유지3 : 4, 도착위치 : 5
+    // 사작 위치 : 10000, 경유지1 : 01000, 경유지2 : 00100, 경유지3 : 00010, 도착위치 : 00001
     /*
     @Column
     private int boardStartingPositionFileAttached; // 파일 있으면 1, 없으면 0
@@ -48,7 +49,6 @@ public class BoardFileEntity {
     @JoinColumn(name = "post_id") // table에 만들어지는 column이름을 정한다.
     private BoardEntity boardEntity; // DB에 BIGINT타입이지만 Long이 아닌 부모entity타입으로 입력해야한다. 실제 DB에는 그냥 ID값만 들어가게된다.
 
-
     @OneToMany(mappedBy = "boardFileEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     // mappedBy : 어떤 것과 매칭을 시킬지 -> BoardFileEntity에 외래키인 boardEntity과 맞춰준다
     // boardFileEntity파일에서 매핑할 변수이름과 동일하게 작성
@@ -59,13 +59,43 @@ public class BoardFileEntity {
         boardFileEntity.setOriginalFileName(originalFileName);
         boardFileEntity.setStoredFileName(storedFileName);
         boardFileEntity.setBoardEntity(boardEntity);
+        //boardFileEntity.setFileAttached(boardFileEntity, 1); // 출발지만 파일 있을때
+        //boardFileEntity.setFileAttached(boardFileEntity, 5); // 도착지만 파일 있을때
         return boardFileEntity;
     }
 
-    public static BoardFileEntity toSaveFileEntity(BoardDTO boardDTO, int num){
-        // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
+    public static BoardFileEntity toUpdateEntityFile(BoardDTO boardDTO) {
         BoardFileEntity boardFileEntity = new BoardFileEntity();
-        boardFileEntity.setFileAttached(num);
+        boardFileEntity.setId(boardDTO.getId()); // jpa에서 update작업임을 나타내는 id값
+        boardFileEntity.setOriginalFileName(boardDTO.getOriginalTitleImageName());
+        boardFileEntity.setStoredFileName(boardDTO.getStoredTitleImageName());
+        boardFileEntity.setFileAttached(boardFileEntity.setFFileAttached(boardFileEntity, 1));
         return boardFileEntity;
+    }
+
+    public int setFFileAttached(BoardFileEntity boardFileEntity, int idx) {
+        int mode = boardFileEntity.getFileAttached();
+        if(idx == 1) {
+            mode = mode + 0B10000;
+            boardFileEntity.setFileAttached(mode);
+        }
+        else if(idx == 2) {
+            mode = mode + 0B01000;
+            boardFileEntity.setFileAttached(mode);
+        }
+        else if(idx == 3) {
+            mode = mode + 0B00100;
+            boardFileEntity.setFileAttached(mode);
+        }
+        else if(idx == 4) {
+            mode = mode + 0B00010;
+            boardFileEntity.setFileAttached(mode);
+        }
+        else if(idx == 5) {
+            mode = mode + 0B00001;
+            boardFileEntity.setFileAttached(mode);
+        }
+
+        return mode;
     }
 }

@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
-@RequiredArgsConstructor // 생성자 주입방식으로 의존성 주입받음
+@RequiredArgsConstructor // 생성자 주입방식으로 의존성 주입받음 => service클래스 호출
 @RequestMapping("/board") // 부모 주소 자동 입력
 public class BoardController {
     private final BoardService boardService; // 생성자 주입방식으로 의존성 주입받음
@@ -33,14 +33,14 @@ public class BoardController {
         System.out.println("boardDTO = " + boardDTO); // 들어온 값 확인
         boardService.save(boardDTO);
         System.out.println("\n============\n");
-        System.out.println("대표사진 : " + boardDTO.getBoardFile());
-        //System.out.println("출발지 : " + boardDTO.getBoardStartingPositionStoredFileName());
+        System.out.println("대표사진 : " + boardDTO.getTitleImage());
+        System.out.println("출발지 : " + boardDTO.getStartingPositionImage());
         //System.out.println("경유지1 : " + boardDTO.getBoardFileStopOver1StoredFileName());
         //System.out.println("경유지2 : " + boardDTO.getBoardFileStopOver2StoredFileName());
         //System.out.println("경유지3 : " + boardDTO.getBoardFileStopOver3StoredFileName());
         //System.out.println("도착지 : " + boardDTO.getBoardFileDestinationStoredFileName());
         System.out.println("\n============\n");
-        return "list";
+        return "index";
     }
 
     @GetMapping("/")
@@ -81,6 +81,7 @@ public class BoardController {
     public String update(@ModelAttribute BoardDTO boardDTO, Model model) {
         /*
             수정 후 수정이 반영된 상세페이지를 보여줌
+            (목록을 보여주어도 됨)
          */
         BoardDTO board = boardService.update(boardDTO);
         model.addAttribute("board", board);

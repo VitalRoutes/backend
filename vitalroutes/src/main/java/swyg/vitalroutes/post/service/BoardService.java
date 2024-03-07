@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// service에서 일어나는 작업
 // Controller -> (DTO -> Entity) -> Repository (entity class에서 이루어질 작업)
 // Repository -> (Entity -> DTO) -> Controller (DTO class에서 이루어질 작업)
 // JPA 특성이 Entity 클래스에 담긴 값들이 DB값에 영향을 줄 수 있다.
@@ -43,18 +44,18 @@ public class BoardService {
     //public void save(BoardDTO boardDTO) throws IOException, ImageProcessingException {
     public void save(BoardDTO boardDTO) throws IOException, ImageProcessingException {
         // DTO -> Entity로 옮겨 담음
-        // 파일 첨부 여부에 따라 로직분리
         System.out.println("========================================================");
         System.out.println("BoardService 클래스에 들어옴...");
         System.out.println("save할거임");
         System.out.println("========================================================");
-        if(boardDTO.getBoardFile().isEmpty()){
+        // 파일 첨부 여부에 따라 로직분리
+        if(boardDTO.getTitleImage().isEmpty()){
             // 첨부 파일이 파일이 없음
-            System.out.println("첨부파일 없음");
+            System.out.println("nothing attached*****************************");
             BoardEntity boardEntity = BoardEntity.toSaveEntity(boardDTO);
             boardRepository.save(boardEntity); // DB에 insert, save()는 entity클래스를 입력받고 반환한다
         } else{
-            System.out.println("첨부파일 있음");
+            System.out.println("there is attached*************************");
             //첨부 파일 있음
             /*
                 1. DTO에 담긴 파일 꺼냄
@@ -67,174 +68,115 @@ public class BoardService {
                 7. board_file_table에 해당 데이터 save 처리
              */
             // 대표사진 파일 저장---------------------------
-            System.out.println("대표사진을 저장하겠습니다.");
-            MultipartFile boardFile = boardDTO.getBoardFile(); // 1.
-            String originalFilename = boardFile.getOriginalFilename(); // 2.
+            System.out.println("saved title_image***********************");
+            MultipartFile boardFile = boardDTO.getTitleImage(); // 1. DTO에 담긴 파일 꺼냄
+            String originalFilename = boardFile.getOriginalFilename(); // 2. 파일의 이름을 가져옴
+            System.out.println("title image name : " + originalFilename);
             String storedFileName = System.currentTimeMillis() + "_" + originalFilename; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-            String savePath = "C:/springboot_img/" + storedFileName; // 4.
-            boardFile.transferTo(new File(savePath)); // 5.
+            String savePath = "C:/springboot_img/" + storedFileName; // 4. 저장 경로 설정
+            System.out.println("stored path : " + savePath);
+            boardFile.transferTo(new File(savePath)); // 5. 해당 경로에 파일 저장
             // DB 저장------------------------------
             BoardEntity boardEntity = BoardEntity.toSaveFileEntity(boardDTO);
+            // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
             Long savedId = boardRepository.save(boardEntity).getId(); // 자식 테이블에서는 부모의 pk값이 필요하다
             BoardEntity board = boardRepository.findById(savedId).get(); // 부모 Entity를 DB에서 가져옴
 
             BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, storedFileName);
             boardFileRepository.save(boardFileEntity);
 
-            /*
+
                 // 출발지 파일 저장
             System.out.println("출발지 사진을 저장하겠습니다.");
-            MultipartFile boardStartingPosition = boardDTO.getBoardStartingPosition(); // 1.
-            String boardStartingPositionOriginalFileName = boardStartingPosition.getOriginalFilename(); // 2.
-            String boardStartingPositionStoredFileName = System.currentTimeMillis() + "_" + boardStartingPositionOriginalFileName; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-            String savePathBoardStartingPosition = "C:/springboot_img/path/" + boardStartingPositionStoredFileName; // 4.
-            boardStartingPosition.transferTo(new File(savePathBoardStartingPosition)); // 5.
+            System.out.println("saved starting position ==============================================");
+            MultipartFile startingPositionImage = boardDTO.getStartingPositionImage();
+            System.out.println("==== before ====");
+            System.out.println("boardDTO : " + boardDTO);
+            System.out.println("boardFileEntity : " + boardFileEntity);
+            System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+            System.out.println("mode : " + boardFileEntity.getFileAttached());
+            saved_path_image(boardDTO, boardFileEntity, startingPositionImage, 1);
+            System.out.println("==== after ====");
+            System.out.println("boardDTO : " + boardDTO);
+            System.out.println("boardFileEntity : " + boardFileEntity);
+            System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+            System.out.println("mode : " + boardFileEntity.getFileAttached());
+            System.out.println("=======================================================================");
 
-            File startPosition = new File(savePathBoardStartingPosition); // 위도 경도
-            Metadata startPositionMetadata = ImageMetadataReader.readMetadata(startPosition);
-            GpsDirectory startPositionGpsDirectory = startPositionMetadata.getFirstDirectoryOfType(GpsDirectory.class);
-            if(startPositionGpsDirectory.containsTag(GpsDirectory.TAG_LATITUDE) &&
-                    startPositionGpsDirectory.containsTag(GpsDirectory.TAG_LONGITUDE)) {
-                String pdsLat = String.valueOf(startPositionGpsDirectory.getGeoLocation().getLatitude());
-                String pdsLon = String.valueOf(startPositionGpsDirectory.getGeoLocation().getLongitude());
-
-                double lat = Double.parseDouble(pdsLat);    //위도
-                double lon = Double.parseDouble(pdsLon);    //경도
-
-                System.out.println("위도 : " + lat);
-                System.out.println("경도 : " + lon);
-                // DB 저장------------------------------
-                BoardFileEntity pathFileEntity = BoardFileEntity.toSaveFileEntity(boardDTO, 1); // 출발지 : 1
-                Long savedStartId = boardFileRepository.save(pathFileEntity).getId(); // 자식 테이블에서는 부모의 pk값이 필요하다
-                BoardFileEntity path_image_1 = boardFileRepository.findById(savedStartId).get(); // 부모 Entity를 DB에서 가져옴
-
-                BoardPathImageEntity boardPathImageEntity = BoardPathImageEntity.toBoardPathImageEntity(path_image_1, lat, lon);
-                boardPathImageRepository.save(boardPathImageEntity);
-            }
-
-                // 도착지 파일 저장
+            // 도착지 파일 저장
             System.out.println("도착지 사진을 저장하겠습니다.");
-            MultipartFile boardFileDestination = boardDTO.getBoardFileDestination(); // 1.
-            String boardFileDestinationOriginalFileName = boardFileDestination.getOriginalFilename(); // 2.
-            String boardFileDestinationStoredFileName = System.currentTimeMillis() + "_" + boardFileDestinationOriginalFileName; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-            String savePathBoardFileDestination = "C:/springboot_img/path/" + boardFileDestinationStoredFileName; // 4.
-            boardFileDestination.transferTo(new File(savePathBoardFileDestination)); // 5.
+            System.out.println("saved destination ==============================================");
+            MultipartFile destinationImage = boardDTO.getDestinationImage();
+            System.out.println("==== before ====");
+            System.out.println("boardDTO : " + boardDTO);
+            System.out.println("boardFileEntity : " + boardFileEntity);
+            System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+            System.out.println("mode : " + boardFileEntity.getFileAttached());
+            saved_path_image(boardDTO, boardFileEntity, destinationImage, 5);
+            System.out.println("==== after ====");
+            System.out.println("boardDTO : " + boardDTO);
+            System.out.println("boardFileEntity : " + boardFileEntity);
+            System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+            System.out.println("mode : " + boardFileEntity.getFileAttached());
+            System.out.println("=======================================================================");
 
-            File destination = new File(savePathBoardFileDestination); // 위도 경도
-            Metadata destinationMetadata = ImageMetadataReader.readMetadata(destination);
-            GpsDirectory destinationGpsDirectory = destinationMetadata.getFirstDirectoryOfType(GpsDirectory.class);
-            if(destinationGpsDirectory.containsTag(GpsDirectory.TAG_LATITUDE) && destinationGpsDirectory.containsTag(GpsDirectory.TAG_LONGITUDE)) {
-                String pdsLat = String.valueOf(destinationGpsDirectory.getGeoLocation().getLatitude());
-                String pdsLon = String.valueOf(destinationGpsDirectory.getGeoLocation().getLongitude());
-
-                double lat = Double.parseDouble(pdsLat);    //위도
-                double lon = Double.parseDouble(pdsLon);    //경도
-
-                System.out.println("위도 : " + lat);
-                System.out.println("경도 : " + lon);
-                // DB 저장------------------------------
-                BoardFileEntity pathFileEntity = BoardFileEntity.toSaveFileEntity(boardDTO, 5); // 도착지 : 5
-                Long savedDestinationId = boardFileRepository.save(pathFileEntity).getId(); // 자식 테이블에서는 부모의 pk값이 필요하다
-                BoardFileEntity path_image_5 = boardFileRepository.findById(savedDestinationId).get(); // 부모 Entity를 DB에서 가져옴
-
-                BoardPathImageEntity boardPathImageEntity = BoardPathImageEntity.toBoardPathImageEntity(path_image_5, lat, lon);
-                boardPathImageRepository.save(boardPathImageEntity);
-            }
-
-            if(boardDTO.getBoardFileStopOver1().isEmpty()) { // 경유지1이 있다면
+            if(!boardDTO.getStopOverImage1().isEmpty()) { // 경유지1이 있다면
                 System.out.println("경유지1 사진을 저장하겠습니다.");
-                MultipartFile boardFileStopOver1 = boardDTO.getBoardFileStopOver1(); // 1.
-                String boardFileStopOver1OriginalFileName = boardFileStopOver1.getOriginalFilename(); // 2.
-                String boardFileStopOver1StoredFileName = System.currentTimeMillis() + "_" + boardFileStopOver1OriginalFileName; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-                String savePathBoardFileStopOver1 = "C:/springboot_img/path/" + boardFileStopOver1StoredFileName; // 4.
-                boardFileStopOver1.transferTo(new File(savePathBoardFileStopOver1)); // 5.
+                System.out.println("saved stopover 1 ==============================================");
+                MultipartFile stopOverImage1 = boardDTO.getStopOverImage1();
+                System.out.println("==== before ====");
+                System.out.println("boardDTO : " + boardDTO);
+                System.out.println("boardFileEntity : " + boardFileEntity);
+                System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+                System.out.println("mode : " + boardFileEntity.getFileAttached());
 
-                File stopOver1 = new File(savePathBoardFileStopOver1); // 위도 경도
-                Metadata stopOver1Metadata = ImageMetadataReader.readMetadata(stopOver1);
-                GpsDirectory stopOver1GpsDirectory = stopOver1Metadata.getFirstDirectoryOfType(GpsDirectory.class);
-                if(stopOver1GpsDirectory.containsTag(GpsDirectory.TAG_LATITUDE) && stopOver1GpsDirectory.containsTag(GpsDirectory.TAG_LONGITUDE)) {
-                    String pdsLat = String.valueOf(stopOver1GpsDirectory.getGeoLocation().getLatitude());
-                    String pdsLon = String.valueOf(stopOver1GpsDirectory.getGeoLocation().getLongitude());
-
-                    double lat = Double.parseDouble(pdsLat);    //위도
-                    double lon = Double.parseDouble(pdsLon);    //경도
-
-                    System.out.println("위도 : " + lat);
-                    System.out.println("경도 : " + lon);
-                    // DB 저장------------------------------
-                    BoardFileEntity pathFileEntity = BoardFileEntity.toSaveFileEntity(boardDTO, 2); // 경유지1 : 2
-                    Long savedStopOver1Id = boardFileRepository.save(pathFileEntity).getId(); // 자식 테이블에서는 부모의 pk값이 필요하다
-                    BoardFileEntity path_image_2 = boardFileRepository.findById(savedStopOver1Id).get(); // 부모 Entity를 DB에서 가져옴
-
-                    BoardPathImageEntity boardPathImageEntity = BoardPathImageEntity.toBoardPathImageEntity(path_image_2, lat, lon);
-                    boardPathImageRepository.save(boardPathImageEntity);
-                }
+                saved_path_image(boardDTO, boardFileEntity, stopOverImage1, 2);
+                System.out.println("==== after ====");
+                System.out.println("boardDTO : " + boardDTO);
+                System.out.println("boardFileEntity : " + boardFileEntity);
+                System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+                System.out.println("mode : " + boardFileEntity.getFileAttached());
+                System.out.println("=======================================================================");
             }
-            if(boardDTO.getBoardFileStopOver2().isEmpty()) { // 경유지2이 있다면
+            if(!boardDTO.getStopOverImage2().isEmpty()) { // 경유지2이 있다면
                 System.out.println("경유지2 사진을 저장하겠습니다.");
-                MultipartFile boardFileStopOver2 = boardDTO.getBoardFileStopOver2(); // 1.
-                String boardFileStopOver2OriginalFileName = boardFileStopOver2.getOriginalFilename(); // 2.
-                String boardFileStopOver2StoredFileName = System.currentTimeMillis() + "_" + boardFileStopOver2OriginalFileName; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-                String savePathBoardFileStopOver2 = "C:/springboot_img/path/" + boardFileStopOver2StoredFileName; // 4.
-                boardFileStopOver2.transferTo(new File(savePathBoardFileStopOver2)); // 5.
-
-                File stopOver2 = new File(savePathBoardFileStopOver2); // 위도 경도
-                Metadata stopOver2Metadata = ImageMetadataReader.readMetadata(stopOver2);
-                GpsDirectory stopOver2GpsDirectory = stopOver2Metadata.getFirstDirectoryOfType(GpsDirectory.class);
-                if(stopOver2GpsDirectory.containsTag(GpsDirectory.TAG_LATITUDE) && stopOver2GpsDirectory.containsTag(GpsDirectory.TAG_LONGITUDE)) {
-                    String pdsLat = String.valueOf(stopOver2GpsDirectory.getGeoLocation().getLatitude());
-                    String pdsLon = String.valueOf(stopOver2GpsDirectory.getGeoLocation().getLongitude());
-
-                    double lat = Double.parseDouble(pdsLat);    //위도
-                    double lon = Double.parseDouble(pdsLon);    //경도
-
-                    System.out.println("위도 : " + lat);
-                    System.out.println("경도 : " + lon);
-                    // DB 저장------------------------------
-                    BoardFileEntity pathFileEntity = BoardFileEntity.toSaveFileEntity(boardDTO, 3); // 경유지2 : 3
-                    Long savedStopOver2Id = boardFileRepository.save(pathFileEntity).getId(); // 자식 테이블에서는 부모의 pk값이 필요하다
-                    BoardFileEntity path_image_3 = boardFileRepository.findById(savedStopOver2Id).get(); // 부모 Entity를 DB에서 가져옴
-
-                    BoardPathImageEntity boardPathImageEntity = BoardPathImageEntity.toBoardPathImageEntity(path_image_3, lat, lon);
-                    boardPathImageRepository.save(boardPathImageEntity);
-                }
+                System.out.println("saved stopover 2 ==============================================");
+                MultipartFile stopOverImage2 = boardDTO.getStopOverImage2();
+                System.out.println("==== before ====");
+                System.out.println("boardDTO : " + boardDTO);
+                System.out.println("boardFileEntity : " + boardFileEntity);
+                System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+                System.out.println("mode : " + boardFileEntity.getFileAttached());
+                saved_path_image(boardDTO, boardFileEntity, stopOverImage2, 3);
+                System.out.println("==== after ====");
+                System.out.println("boardDTO : " + boardDTO);
+                System.out.println("boardFileEntity : " + boardFileEntity);
+                System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+                System.out.println("mode : " + boardFileEntity.getFileAttached());
+                System.out.println("=======================================================================");
             }
-            if(boardDTO.getBoardFileStopOver3().isEmpty()) { // 경유지3이 있다면
+            if(!boardDTO.getStopOverImage1().isEmpty()) { // 경유지1이 있다면
                 System.out.println("경유지3 사진을 저장하겠습니다.");
-                MultipartFile boardFileStopOver3 = boardDTO.getBoardFileStopOver3(); // 1.
-                String boardFileStopOver3OriginalFileName = boardFileStopOver3.getOriginalFilename(); // 2.
-                String boardFileStopOver3StoredFileName = System.currentTimeMillis() + "_" + boardFileStopOver3OriginalFileName; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-                String savePathBoardFileStopOver3 = "C:/springboot_img/path/" + boardFileStopOver3StoredFileName; // 4.
-                boardFileStopOver3.transferTo(new File(savePathBoardFileStopOver3)); // 5.
-
-                File stopOver3 = new File(savePathBoardFileStopOver3); // 위도 경도
-                Metadata stopOver3Metadata = ImageMetadataReader.readMetadata(stopOver3);
-                GpsDirectory stopOver3GpsDirectory = stopOver3Metadata.getFirstDirectoryOfType(GpsDirectory.class);
-                if(stopOver3GpsDirectory.containsTag(GpsDirectory.TAG_LATITUDE) && stopOver3GpsDirectory.containsTag(GpsDirectory.TAG_LONGITUDE)) {
-                    String pdsLat = String.valueOf(stopOver3GpsDirectory.getGeoLocation().getLatitude());
-                    String pdsLon = String.valueOf(stopOver3GpsDirectory.getGeoLocation().getLongitude());
-
-                    double lat = Double.parseDouble(pdsLat);    //위도
-                    double lon = Double.parseDouble(pdsLon);    //경도
-
-                    System.out.println("위도 : " + lat);
-                    System.out.println("경도 : " + lon);
-                    // DB 저장------------------------------
-                    BoardFileEntity pathFileEntity = BoardFileEntity.toSaveFileEntity(boardDTO, 4); // 경유지3 : 4
-                    Long savedStopOver3Id = boardFileRepository.save(pathFileEntity).getId(); // 자식 테이블에서는 부모의 pk값이 필요하다
-                    BoardFileEntity path_image_4 = boardFileRepository.findById(savedStopOver3Id).get(); // 부모 Entity를 DB에서 가져옴
-
-                    BoardPathImageEntity boardPathImageEntity = BoardPathImageEntity.toBoardPathImageEntity(path_image_4, lat, lon);
-                    boardPathImageRepository.save(boardPathImageEntity);
-                }
+                System.out.println("saved stopover 3 ==============================================");
+                MultipartFile stopOverImage3 = boardDTO.getStopOverImage3();
+                System.out.println("==== before ====");
+                System.out.println("boardDTO : " + boardDTO);
+                System.out.println("boardFileEntity : " + boardFileEntity);
+                System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+                System.out.println("mode : " + boardFileEntity.getFileAttached());
+                saved_path_image(boardDTO, boardFileEntity, stopOverImage3, 4);
+                System.out.println("==== after ====");
+                System.out.println("boardDTO : " + boardDTO);
+                System.out.println("boardFileEntity : " + boardFileEntity);
+                System.out.println("file name : " + boardFileEntity.getOriginalFileName());
+                System.out.println("mode : " + boardFileEntity.getFileAttached());
+                System.out.println("=======================================================================");
             }
-
-             */
         }
     }
 
     @Transactional
-    public List<BoardDTO> findAll() {
+    public List<BoardDTO> findAll() { // 게시글 목록 조회
         List<BoardEntity> boardEntityList = boardRepository.findAll(); // 리스트 형태의 entity가 넘어옴
         List<BoardDTO> boardDTOList = new ArrayList<>();
 
@@ -302,5 +244,36 @@ public class BoardService {
         // 목록 : id, writer, title, hit, createdTime => 관련 정보를 담을 BoardDTO객체를 생성해준다.
         Page<BoardDTO> boardDTOS = boardEntities.map(board -> new BoardDTO(board.getId(), board.getBoardWriter(), board.getBoardTitle(), board.getBoardHits(), board.getCreatedTime())); // boardEntities객체에서 board 매개변수에 담아서 하나씩 꺼내 BoardDTO에 옮긴다.
         return boardDTOS;
+    }
+
+    public void saved_path_image(BoardDTO boardDTO, BoardFileEntity boardFileEntity, MultipartFile pathImageFile, int locationOnRoute) throws IOException, ImageProcessingException {
+        //MultipartFile pathImageFile = boardDTO.getStartingPositionImage(); // 1.
+        //boardFileEntity.setFileAttached(boardFileEntity, locationOnRoute);
+        String originalFilename = pathImageFile.getOriginalFilename(); // 2.
+        String storedFileName = System.currentTimeMillis() + "_" + originalFilename; // 3. 시간을 밀리초로 바꾼 난수을 붙임
+        String savePath = "C:/springboot_img/path/" + storedFileName; // 4.
+        pathImageFile.transferTo(new File(savePath)); // 5.
+
+        File startPosition = new File(savePath); // 위도 경도
+        Metadata pathImageFileMetadata = ImageMetadataReader.readMetadata(startPosition);
+        GpsDirectory pathImageFileGpsDirectory = pathImageFileMetadata.getFirstDirectoryOfType(GpsDirectory.class);
+        if(pathImageFileGpsDirectory.containsTag(GpsDirectory.TAG_LATITUDE) &&
+                pathImageFileGpsDirectory.containsTag(GpsDirectory.TAG_LONGITUDE)) {
+            String pdsLat = String.valueOf(pathImageFileGpsDirectory.getGeoLocation().getLatitude());
+            String pdsLon = String.valueOf(pathImageFileGpsDirectory.getGeoLocation().getLongitude());
+
+            double lat = Double.parseDouble(pdsLat);    //위도
+            double lon = Double.parseDouble(pdsLon);    //경도
+
+            System.out.println("****latitude : " + lat);
+            System.out.println("****longitude : " + lon);
+
+            // DB 저장------------------------------
+            BoardPathImageEntity boardPathImageEntity = BoardPathImageEntity.toBoardPathImageEntity(boardFileEntity,
+                    originalFilename,
+                    storedFileName,
+                    lat, lon, locationOnRoute);
+            boardPathImageRepository.save(boardPathImageEntity);
+        }
     }
 }
