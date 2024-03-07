@@ -1,4 +1,4 @@
-package swyg.vitalroutes.security.domain;
+package swyg.vitalroutes.security.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

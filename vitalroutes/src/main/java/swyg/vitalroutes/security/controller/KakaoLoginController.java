@@ -19,7 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.domain.SocialType;
-import swyg.vitalroutes.security.domain.SocialMemberDTO;
+import swyg.vitalroutes.security.dto.SocialMemberDTO;
 import swyg.vitalroutes.security.service.KakaoLoginService;
 import swyg.vitalroutes.security.utils.JwtConstants;
 import swyg.vitalroutes.security.utils.JwtTokenProvider;

@@ -1,7 +1,8 @@
-package swyg.vitalroutes.member.domain;
+package swyg.vitalroutes.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import swyg.vitalroutes.member.domain.Member;
 
 @Schema(description = "회원 정보 수정 시 사용, 수정하는 정보만 담아서 전달해야함")
 @Data
