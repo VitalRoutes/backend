@@ -41,6 +41,7 @@ public class BoardService {
     private final BoardFileRepository boardFileRepository; // 생성자 주입방식으로 의존성 주입받음
     private final BoardPathImageRepository boardPathImageRepository; // 생성자 주입방식으로 의존성 주입받음
 
+    @Transactional
     //public void save(BoardDTO boardDTO) throws IOException, ImageProcessingException {
     public void save(BoardDTO boardDTO) throws IOException, ImageProcessingException {
         // DTO -> Entity로 옮겨 담음
@@ -95,6 +96,9 @@ public class BoardService {
             System.out.println("boardFileEntity : " + boardFileEntity);
             System.out.println("file name : " + boardFileEntity.getOriginalFileName());
             System.out.println("mode : " + boardFileEntity.getFileAttached());
+
+            boardFileEntity.setFileAttached(boardFileEntity.getFileAttached() + 0B10000);
+
             saved_path_image(boardDTO, boardFileEntity, startingPositionImage, 1);
             System.out.println("==== after ====");
             System.out.println("boardDTO : " + boardDTO);
@@ -112,6 +116,7 @@ public class BoardService {
             System.out.println("boardFileEntity : " + boardFileEntity);
             System.out.println("file name : " + boardFileEntity.getOriginalFileName());
             System.out.println("mode : " + boardFileEntity.getFileAttached());
+            boardFileEntity.setFileAttached(boardFileEntity.getFileAttached() + 0B00001);
             saved_path_image(boardDTO, boardFileEntity, destinationImage, 5);
             System.out.println("==== after ====");
             System.out.println("boardDTO : " + boardDTO);
@@ -120,7 +125,7 @@ public class BoardService {
             System.out.println("mode : " + boardFileEntity.getFileAttached());
             System.out.println("=======================================================================");
 
-            if(!boardDTO.getStopOverImage1().isEmpty()) { // 경유지1이 있다면
+            if(boardDTO.getStopOverImage1() != null) { // 경유지1이 있다면
                 System.out.println("경유지1 사진을 저장하겠습니다.");
                 System.out.println("saved stopover 1 ==============================================");
                 MultipartFile stopOverImage1 = boardDTO.getStopOverImage1();
@@ -129,7 +134,7 @@ public class BoardService {
                 System.out.println("boardFileEntity : " + boardFileEntity);
                 System.out.println("file name : " + boardFileEntity.getOriginalFileName());
                 System.out.println("mode : " + boardFileEntity.getFileAttached());
-
+                boardFileEntity.setFileAttached(boardFileEntity.getFileAttached() + 0B01000);
                 saved_path_image(boardDTO, boardFileEntity, stopOverImage1, 2);
                 System.out.println("==== after ====");
                 System.out.println("boardDTO : " + boardDTO);
@@ -138,7 +143,7 @@ public class BoardService {
                 System.out.println("mode : " + boardFileEntity.getFileAttached());
                 System.out.println("=======================================================================");
             }
-            if(!boardDTO.getStopOverImage2().isEmpty()) { // 경유지2이 있다면
+            if(boardDTO.getStopOverImage2() != null) { // 경유지2이 있다면
                 System.out.println("경유지2 사진을 저장하겠습니다.");
                 System.out.println("saved stopover 2 ==============================================");
                 MultipartFile stopOverImage2 = boardDTO.getStopOverImage2();
@@ -147,6 +152,7 @@ public class BoardService {
                 System.out.println("boardFileEntity : " + boardFileEntity);
                 System.out.println("file name : " + boardFileEntity.getOriginalFileName());
                 System.out.println("mode : " + boardFileEntity.getFileAttached());
+                boardFileEntity.setFileAttached(boardFileEntity.getFileAttached() + 0B00100);
                 saved_path_image(boardDTO, boardFileEntity, stopOverImage2, 3);
                 System.out.println("==== after ====");
                 System.out.println("boardDTO : " + boardDTO);
@@ -155,7 +161,7 @@ public class BoardService {
                 System.out.println("mode : " + boardFileEntity.getFileAttached());
                 System.out.println("=======================================================================");
             }
-            if(!boardDTO.getStopOverImage1().isEmpty()) { // 경유지1이 있다면
+            if(boardDTO.getStopOverImage1() != null) { // 경유지1이 있다면
                 System.out.println("경유지3 사진을 저장하겠습니다.");
                 System.out.println("saved stopover 3 ==============================================");
                 MultipartFile stopOverImage3 = boardDTO.getStopOverImage3();
@@ -164,6 +170,7 @@ public class BoardService {
                 System.out.println("boardFileEntity : " + boardFileEntity);
                 System.out.println("file name : " + boardFileEntity.getOriginalFileName());
                 System.out.println("mode : " + boardFileEntity.getFileAttached());
+                boardFileEntity.setFileAttached(boardFileEntity.getFileAttached() + 0B00010);
                 saved_path_image(boardDTO, boardFileEntity, stopOverImage3, 4);
                 System.out.println("==== after ====");
                 System.out.println("boardDTO : " + boardDTO);
