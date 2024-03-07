@@ -100,7 +100,8 @@ public class CommentController {
         }
 
         try {
-            commentService.saveComment(saveDTO);
+            Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            commentService.saveComment(member.getMemberId(), saveDTO);
         } catch (CommentException exception) {
             return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         }

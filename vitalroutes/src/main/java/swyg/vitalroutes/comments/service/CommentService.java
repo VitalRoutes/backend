@@ -52,8 +52,9 @@ public class CommentService {
     }
 
 
-    public void saveComment(CommentSaveDTO saveDTO) {
-        Member member = memberRepository.findById(saveDTO.getMemberId())
+    public void saveComment(Long memberId, CommentSaveDTO saveDTO) {
+        // 거치지 않아도 되지만 거치려고함
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CommentException(NOT_FOUND, FAIL, "사용자가 존재하지 않습니다"));
         Participation participation = participationRepository.findById(saveDTO.getParticipationId())
                 .orElseThrow(() -> new CommentException(NOT_FOUND, FAIL, "챌린지 참여가 존재하지 않습니다"));

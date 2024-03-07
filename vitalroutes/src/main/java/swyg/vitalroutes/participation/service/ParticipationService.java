@@ -72,7 +72,7 @@ public class ParticipationService {
     }
 
 
-    public void saveParticipation(ParticipationSaveDTO saveDTO) {
+    public void saveParticipation(Long memberId, ParticipationSaveDTO saveDTO) {
         List<ParticipationImage> participationImages = new ArrayList<>();
         List<MultipartFile> files = saveDTO.getFiles();
         int seq = 0;
@@ -88,7 +88,8 @@ public class ParticipationService {
             participationImages.add(ParticipationImage.createParticipationImage(++seq, fileName));
         }
 
-        Member member = memberRepository.findById(saveDTO.getMemberId())
+        // 거치지 않아도 되지만 DB 에서 조회하는 걸로 남김
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "사용자가 존재하지 않습니다"));
         BoardEntity board = boardRepository.findById(saveDTO.getBoardId())
                 .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "게시글이 존재하지 않습니다"));

@@ -107,7 +107,8 @@ public class ParticipationController {
         }
 
         try {
-            participationService.saveParticipation(saveDTO);
+            Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            participationService.saveParticipation(member.getMemberId(), saveDTO);
         } catch (FileProcessException exception) {
             return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         } catch (ParticipationException exception) {
