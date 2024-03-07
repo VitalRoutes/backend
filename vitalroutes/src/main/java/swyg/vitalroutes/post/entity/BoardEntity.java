@@ -45,13 +45,13 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
     public static BoardEntity toSaveEntity(BoardDTO boardDTO){
         // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
         BoardEntity boardEntity = new BoardEntity();
-        boardEntity.setBoardWriter(boardDTO.getBoardWriter());
-        boardEntity.setBoardTitle(boardDTO.getBoardTitle());
-        boardEntity.setBoardContents(boardDTO.getBoardContents());
+        boardEntity.setBoardWriter(boardDTO.getBoardWriter()); // 작성자
+        boardEntity.setBoardTitle(boardDTO.getBoardTitle()); // 제목
+        boardEntity.setBoardContents(boardDTO.getBoardContents()); // 본문
         boardEntity.setBoardTransportation(Integer
-                .parseInt(boardDTO.getBoardTransportation()));
-        boardEntity.setBoardHits(0);
-        boardEntity.setFileAttached(0);
+                .parseInt(boardDTO.getBoardTransportation())); // 이동 수단 : 걷기(0), 자전거(1)
+        boardEntity.setBoardHits(0); // 조회수
+        boardEntity.setFileAttached(0); // 파일 존재여부 없음
         return boardEntity;
     }
 
@@ -67,15 +67,15 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
         return boardEntity;
     }
 
-    public static BoardEntity toSaveFileEntity(BoardDTO boardDTO) {
+    public static BoardEntity toSaveFileEntity(BoardDTO boardDTO) { // service에서 파일첨부가 있는 경우 호출되는 함수
         // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
         BoardEntity boardEntity = new BoardEntity();
-        boardEntity.setBoardWriter(boardDTO.getBoardWriter());
-        boardEntity.setBoardTitle(boardDTO.getBoardTitle());
-        boardEntity.setBoardContents(boardDTO.getBoardContents());
+        boardEntity.setBoardWriter(boardDTO.getBoardWriter()); // 작성자
+        boardEntity.setBoardTitle(boardDTO.getBoardTitle()); // 제목
+        boardEntity.setBoardContents(boardDTO.getBoardContents()); // 본문
         boardEntity.setBoardTransportation(Integer
-                .parseInt(boardDTO.getBoardTransportation()));
-        boardEntity.setBoardHits(0);
+                .parseInt(boardDTO.getBoardTransportation())); // 이동 수단 : 걷기(0), 자전거(1)
+        boardEntity.setBoardHits(0); // 조회수
         boardEntity.setFileAttached(1); // 파일 있음.
         return boardEntity;
     }
