@@ -1,6 +1,9 @@
 package swyg.vitalroutes.post.controller;
 
 import com.drew.imaging.ImageProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,13 +11,21 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import swyg.vitalroutes.common.response.ApiResponseDTO;
+import swyg.vitalroutes.member.domain.MemberNicknameDTO;
 import swyg.vitalroutes.post.dto.BoardDTO;
+import swyg.vitalroutes.post.dto.ChallengeSaveFormDTO;
 import swyg.vitalroutes.post.service.BoardService;
 
 import java.io.IOException;
 import java.util.List;
 
-@Controller
+import static org.springframework.http.HttpStatus.OK;
+import static swyg.vitalroutes.common.response.ResponseType.SUCCESS;
+
+@Tag(name = "Challenge API Controller", description = "Challenge 생성, 조회, 수정, 삭제 기능 제공")
+//@Controller
+@RestController
 @RequiredArgsConstructor // 생성자 주입방식으로 의존성 주입받음 => service클래스 호출
 @RequestMapping("/board") // 부모 주소 자동 입력
 public class BoardController {
@@ -25,10 +36,14 @@ public class BoardController {
         return "save"; // save.html 반환 (게시글 저장 페이지)
     }
 
+    @Operation(summary = "새로운 챌린지 생성", description = "새로운 챌린지를 생성(등록) 할 수 있다.")
+    @ApiResponse(responseCode = "200", description = "챌린지 생성(등록) 완료")
     @PostMapping("/save") // 클라이언트로부터 post로 /save주소로 요청을 받음
-    public String save(@ModelAttribute BoardDTO boardDTO) throws IOException, ImageProcessingException { // html에서 Controller로 전달해줄 때, 가장 간단한 방법은 @RequestParam() 방법이 있다. 여기서는 대신 @ModelAttribute 사용
+    public ApiResponseDTO<?> save(ChallengeSaveFormDTO challengeSaveFormDTO) throws ImageProcessingException, IOException {
+    //public String save(@ModelAttribute BoardDTO boardDTO) throws IOException, ImageProcessingException { // html에서 Controller로 전달해줄 때, 가장 간단한 방법은 @RequestParam() 방법이 있다. 여기서는 대신 @ModelAttribute 사용
         // @ModelAttribute에 의해 BoardDTO boardDTO클래스 객체를 찾아서
         // save.html의 name들과 BoardDTO의 필드값이 동일하다면 Spring이 해당하는 필드에 대한 Setter호출해 html에 담긴값을 Setter method에 알아서 담아줌
+        BoardDTO boardDTO = toTransformBoardDTO(challengeSaveFormDTO); // challengeSaveForm -> boardDTO
         System.out.println("\n============\nindex.html로 이동\n============\n");
         System.out.println("boardDTO = " + boardDTO); // 들어온 값 확인
         boardService.save(boardDTO);
@@ -40,7 +55,51 @@ public class BoardController {
         //System.out.println("경유지3 : " + boardDTO.getBoardFileStopOver3StoredFileName());
         //System.out.println("도착지 : " + boardDTO.getBoardFileDestinationStoredFileName());
         System.out.println("\n============\n");
-        return "index";
+        challengeSaveFormDTO = toTransformChallengeSaveFormDTO(boardDTO);
+        return new ApiResponseDTO<>(OK, SUCCESS, "Challenge가 생성되었습니다.", null);
+        //return "index";
+    }
+
+    private ChallengeSaveFormDTO toTransformChallengeSaveFormDTO(BoardDTO boardDTO) {
+        ChallengeSaveFormDTO challengeSaveFormDTO = new ChallengeSaveFormDTO();
+        challengeSaveFormDTO.setChallengeWriter(boardDTO.getBoardWriter());
+        challengeSaveFormDTO.setChallengeTitle(boardDTO.getBoardTitle());
+        challengeSaveFormDTO.setChallengeContents(boardDTO.getBoardContents());
+        challengeSaveFormDTO.setChallengeTransportation(boardDTO.getBoardTransportation());
+        challengeSaveFormDTO.setTitleImage(boardDTO.getTitleImage());
+        challengeSaveFormDTO.setStartingPositionImage(boardDTO.getStartingPositionImage());
+        challengeSaveFormDTO.setDestinationImage(boardDTO.getDestinationImage());
+        if(boardDTO.getStopOverImage1() != null) {
+            challengeSaveFormDTO.setStopOverImage1(boardDTO.getStopOverImage1());
+        }
+        if(boardDTO.getStopOverImage2() != null) {
+            challengeSaveFormDTO.setStopOverImage2(boardDTO.getStopOverImage2());
+        }
+        if(boardDTO.getStopOverImage3() != null) {
+            challengeSaveFormDTO.setStopOverImage3(boardDTO.getStopOverImage3());
+        }
+        return challengeSaveFormDTO;
+    }
+
+    private BoardDTO toTransformBoardDTO(ChallengeSaveFormDTO challengeSaveFormDTO) {
+        BoardDTO boardDTO = new BoardDTO();
+        boardDTO.setBoardWriter(challengeSaveFormDTO.getChallengeWriter());
+        boardDTO.setBoardTitle(challengeSaveFormDTO.getChallengeTitle());
+        boardDTO.setBoardContents(challengeSaveFormDTO.getChallengeContents());
+        boardDTO.setBoardTransportation(challengeSaveFormDTO.getChallengeTransportation());
+        boardDTO.setTitleImage(challengeSaveFormDTO.getTitleImage());
+        boardDTO.setStartingPositionImage(challengeSaveFormDTO.getStartingPositionImage());
+        boardDTO.setDestinationImage(challengeSaveFormDTO.getDestinationImage());
+        if(challengeSaveFormDTO.getStopOverImage1() != null) {
+            boardDTO.setStopOverImage1(challengeSaveFormDTO.getStopOverImage1());
+        }
+        if(challengeSaveFormDTO.getStopOverImage2() != null) {
+            boardDTO.setStopOverImage2(challengeSaveFormDTO.getStopOverImage2());
+        }
+        if(challengeSaveFormDTO.getStopOverImage3() != null) {
+            boardDTO.setStopOverImage3(challengeSaveFormDTO.getStopOverImage3());
+        }
+        return boardDTO;
     }
 
     @GetMapping("/")
@@ -53,8 +112,12 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
+    /*
     public String findById(@PathVariable("id") Long id, Model model, // 경로상의 값을 가져올때는 @PathVariable를 사용
                            @PageableDefault(page=1) Pageable pageable) {
+     */
+    public BoardDTO findById(@PathVariable("id") Long id, Model model, // 경로상의 값을 가져올때는 @PathVariable를 사용
+                            @PageableDefault(page=1) Pageable pageable) {
         /*
             해당 게시글의 조회수를 하나 올리고
             게시글 데이터를 가져와서 detail.html에 출력
@@ -64,7 +127,8 @@ public class BoardController {
         BoardDTO boardDTO = boardService.findById(id);
         model.addAttribute("board", boardDTO);
         model.addAttribute("page", pageable.getPageNumber());
-        return "detail";
+        //return "detail";
+        return boardDTO;
     }
 
     @GetMapping("/update/{id}")

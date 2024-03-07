@@ -3,11 +3,7 @@ package swyg.vitalroutes.post.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Controller;
 import swyg.vitalroutes.post.dto.BoardDTO;
-
-import java.util.ArrayList;
-import java.util.List;
 
 // DB의 테이블 역할을 하는 클래스
 @Entity // Entity로 사용하는 클래스임을 명시
@@ -37,10 +33,10 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
     @Column
     private int fileAttached; // 파일 있으면 1, 없으면 0
 
-    @OneToMany(mappedBy = "boardEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "boardEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     // mappedBy : 어떤 것과 매칭을 시킬지 -> BoardFileEntity에 외래키인 boardEntity과 맞춰준다
     // boardFileEntity파일에서 매핑할 변수이름과 동일하게 작성
-    private List<BoardFileEntity> boardFileEntityList = new ArrayList<>();
+    private BoardFileEntity boardFileEntity;
 
     public static BoardEntity toSaveEntity(BoardDTO boardDTO){
         // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
