@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import swyg.vitalroutes.participation.domain.Participation;
 
+import java.util.List;
+
 public interface ParticipationRepository extends JpaRepository<Participation, Long> {
     @EntityGraph(attributePaths = "participationImages")
-    @Query("select p from Participation p join fetch p.member where p.board.id = :boardId")
-    Page<Participation> findAllByBoardId(@Param("boardId") Long boardId, Pageable pageable);
+    @Query("select p from Participation p join fetch p.member where p.board.id = :boardId and p.participationId not in :hidedIds")
+    Page<Participation> findAllByBoardId(@Param("boardId") Long boardId, @Param("hidedIds") List<Long> hidedIds, Pageable pageable);
 }

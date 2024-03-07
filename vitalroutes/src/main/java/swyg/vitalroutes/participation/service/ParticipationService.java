@@ -11,6 +11,7 @@ import swyg.vitalroutes.comments.repository.CommentRepository;
 import swyg.vitalroutes.common.exception.ParticipationException;
 import swyg.vitalroutes.common.response.DataWithCount;
 import swyg.vitalroutes.common.utils.FileUtils;
+import swyg.vitalroutes.hide.repository.HideRepository;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.repository.MemberRepository;
 import swyg.vitalroutes.participation.domain.ParticipationImage;
@@ -33,6 +34,7 @@ import static swyg.vitalroutes.common.response.ResponseType.*;
 @RequiredArgsConstructor
 public class ParticipationService {
 
+    private final HideRepository hideRepository;
     private final ParticipationRepository participationRepository;
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
@@ -40,12 +42,26 @@ public class ParticipationService {
     private final S3UploadService s3UploadService;
 
 
-    public DataWithCount<?> findParticipation(Long boardId, Pageable pageable) {
-        Page<Participation> pagingData = participationRepository.findAllByBoardId(boardId, pageable);
+    public DataWithCount<?> findParticipation(Long memberId, Long boardId, Pageable pageable) {
+        // 숨김처리한 참여 게시글의 ID 를 조회
+        List<Long> hidedParticipations = hideRepository.findHidedParticipations(memberId);
+        List<Long> hidedComments = hideRepository.findHidedComments(memberId);
+        
+        // 숨김처리한 게시글 혹은 댓글이 없으면 NULL 이 들어가서 아무것도 조회되지 않음
+        if (hidedParticipations.size() == 0) {
+            hidedParticipations.add(-1L);
+        }
+        
+        if (hidedComments.size() == 0) {
+            hidedComments.add(-1L);
+        }
+
+        // 참여 게시글 조회
+        Page<Participation> pagingData = participationRepository.findAllByBoardId(boardId, hidedParticipations, pageable);
         List<ParticipationResponseDTO> dtoList = pagingData.map(ParticipationResponseDTO::new).toList();
 
         for (ParticipationResponseDTO dto : dtoList) {
-            long size = commentRepository.countByParticipationId(dto.getParticipationId());
+            long size = commentRepository.countByParticipationId(dto.getParticipationId(), hidedComments);
             dto.setTotalComments(size);
         }
 

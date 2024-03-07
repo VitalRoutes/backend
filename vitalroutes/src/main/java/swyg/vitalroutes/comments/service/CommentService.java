@@ -13,6 +13,7 @@ import swyg.vitalroutes.comments.dto.CommentSaveDTO;
 import swyg.vitalroutes.comments.repository.CommentRepository;
 import swyg.vitalroutes.common.exception.CommentException;
 import swyg.vitalroutes.common.response.DataWithCount;
+import swyg.vitalroutes.hide.repository.HideRepository;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.repository.MemberRepository;
 import swyg.vitalroutes.participation.domain.Participation;
@@ -20,7 +21,6 @@ import swyg.vitalroutes.participation.repository.ParticipationRepository;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static swyg.vitalroutes.common.response.ResponseType.FAIL;
 
@@ -29,13 +29,20 @@ import static swyg.vitalroutes.common.response.ResponseType.FAIL;
 @Transactional
 @RequiredArgsConstructor
 public class CommentService {
+
+    private final HideRepository hideRepository;
     private final CommentRepository commentRepository;
     private final ParticipationRepository participationRepository;
     private final MemberRepository memberRepository;
 
 
-    public DataWithCount<?> viewComments(Long participationId, Pageable pageable) {
-        Page<Comment> pagingData = commentRepository.findAllByParticipationId(participationId, pageable);
+    public DataWithCount<?> viewComments(Long memberId, Long participationId, Pageable pageable) {
+        List<Long> hidedComments = hideRepository.findHidedComments(memberId);
+        // 숨김처리한 게시글 혹은 댓글이 없으면 NULL 이 들어가서 아무것도 조회되지 않음
+        if (hidedComments.size() == 0) {
+            hidedComments.add(-1L);
+        }
+        Page<Comment> pagingData = commentRepository .findAllByParticipationId(participationId, hidedComments, pageable);
         Page<CommentResponseDTO> pagingDTO = pagingData.map(CommentResponseDTO::new);
 
         long count = pagingData.getTotalElements();
