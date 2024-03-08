@@ -1,11 +1,8 @@
 spring:
   datasource:
-    #url: ENC(jO49RGHnkCNy+rqEKuRQ4du128xO/FGprtYMt5NCX0iNdSjOFsbOCY/h/hSWLBPbKUa0zp2gAIFhYBsNShkXCgJw05bgcInPTm47U3/FqH7yBwWuOSVXNzhhmM6CxYTzhMKyPlGjOKo8VDafXIP1qwjM/DtXjLpi)
-    #username: ENC(WXJRUma8h4Aa17BMomL3Vw==)
-    #password: ENC(ep1lvgJv5L9UAVQJQQW/Zg==)
-    url: jdbc:mysql://3.24.175.130:3306/vital_routes_DB?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: joohan
-    password: 1
+    url: ENC(jO49RGHnkCNy+rqEKuRQ4du128xO/FGprtYMt5NCX0iNdSjOFsbOCY/h/hSWLBPbKUa0zp2gAIFhYBsNShkXCgJw05bgcInPTm47U3/FqH7yBwWuOSVXNzhhmM6CxYTzhMKyPlGjOKo8VDafXIP1qwjM/DtXjLpi)
+    username: ENC(WXJRUma8h4Aa17BMomL3Vw==)
+    password: ENC(ep1lvgJv5L9UAVQJQQW/Zg==)
     driver-class-name: com.mysql.cj.jdbc.Driver
   thymeleaf:
     cache: false
