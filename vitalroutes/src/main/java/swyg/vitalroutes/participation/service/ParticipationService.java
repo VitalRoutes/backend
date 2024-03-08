@@ -24,6 +24,7 @@ import swyg.vitalroutes.post.repository.BoardPathImageRepository;
 import swyg.vitalroutes.post.repository.BoardRepository;
 import swyg.vitalroutes.s3.S3UploadService;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.springframework.http.HttpStatus.*;
@@ -99,8 +100,6 @@ public class ParticipationService {
         
         
         for (MultipartFile file : files) {
-            String fileName = "file image url";
-            // String fileName = s3UploadService.saveFile(file);
             double[] locationInfo = FileUtils.getLocationInfo(file);
 
             // 거리 비교
@@ -111,11 +110,18 @@ public class ParticipationService {
             if (distance > 5) {
                 throw new ParticipationException(BAD_REQUEST, FAIL, (seq + 1) + "번째 지점의 거리가 멀리 떨어져있습니다. 챌린지 지점과의 거리는 5m 이하여야 합니다. 현재거리 = " + (int) distance + "m");
             }
+            // 이상 없으면 업로드 진행
+            String fileName = "";
+            try {
+                fileName = s3UploadService.saveFile(file);
+            } catch (IOException e) {
+                throw new ParticipationException(INTERNAL_SERVER_ERROR, FAIL, "파일 업로드 중 에러가 발생하였습니다");
+            }
             participationImages.add(ParticipationImage.createParticipationImage(++seq, fileName));
         }
         
         Participation participation = Participation.createParticipation(saveDTO.getContent(), member, board, participationImages);
-        //participationRepository.save(participation);
+        participationRepository.save(participation);
     }
 
     public void deleteParticipation(Long participationId) {
@@ -156,14 +162,13 @@ public class ParticipationService {
         if (distance > 5) {
             throw new ParticipationException(BAD_REQUEST, FAIL, sequence + "번째 지점의 거리가 멀리 떨어져있습니다. 챌린지 지점과의 거리는 5m 이하여야 합니다. 현재거리 = " + (int) distance + "m");
         }
-
-        /*
+        
         try {
             url = s3UploadService.saveFile(file);
         } catch (IOException exception) {
             throw new ParticipationException(INTERNAL_SERVER_ERROR, FAIL, "파일 업로드 중 에러가 발생하였습니다");
         }
-        */
+        
         return new ImageResponseDTO(sequence, url);
     }
 
