@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
-import swyg.vitalroutes.member.domain.MemberNicknameDTO;
+import swyg.vitalroutes.member.dto.MemberNicknameDTO;
 import swyg.vitalroutes.post.dto.BoardDTO;
 import swyg.vitalroutes.post.dto.ChallengeSaveFormDTO;
 import swyg.vitalroutes.post.service.BoardService;
