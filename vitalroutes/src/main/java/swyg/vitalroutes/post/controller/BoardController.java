@@ -18,6 +18,7 @@ import swyg.vitalroutes.post.dto.ChallengeSaveFormDTO;
 import swyg.vitalroutes.post.service.BoardService;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -39,22 +40,12 @@ public class BoardController {
     @Operation(summary = "새로운 챌린지 생성", description = "새로운 챌린지를 생성(등록) 할 수 있다.")
     @ApiResponse(responseCode = "200", description = "챌린지 생성(등록) 완료")
     @PostMapping("/save") // 클라이언트로부터 post로 /save주소로 요청을 받음
-    public ApiResponseDTO<?> save(ChallengeSaveFormDTO challengeSaveFormDTO) throws ImageProcessingException, IOException {
+    public ApiResponseDTO<?> save(ChallengeSaveFormDTO challengeSaveFormDTO) throws ImageProcessingException, IOException, URISyntaxException {
     //public String save(@ModelAttribute BoardDTO boardDTO) throws IOException, ImageProcessingException { // html에서 Controller로 전달해줄 때, 가장 간단한 방법은 @RequestParam() 방법이 있다. 여기서는 대신 @ModelAttribute 사용
-        // @ModelAttribute에 의해 BoardDTO boardDTO클래스 객체를 찾아서
-        // save.html의 name들과 BoardDTO의 필드값이 동일하다면 Spring이 해당하는 필드에 대한 Setter호출해 html에 담긴값을 Setter method에 알아서 담아줌
         BoardDTO boardDTO = toTransformBoardDTO(challengeSaveFormDTO); // challengeSaveForm -> boardDTO
         System.out.println("\n============\nindex.html로 이동\n============\n");
         System.out.println("boardDTO = " + boardDTO); // 들어온 값 확인
         boardService.save(boardDTO);
-        System.out.println("\n============\n");
-        System.out.println("대표사진 : " + boardDTO.getTitleImage());
-        System.out.println("출발지 : " + boardDTO.getStartingPositionImage());
-        //System.out.println("경유지1 : " + boardDTO.getBoardFileStopOver1StoredFileName());
-        //System.out.println("경유지2 : " + boardDTO.getBoardFileStopOver2StoredFileName());
-        //System.out.println("경유지3 : " + boardDTO.getBoardFileStopOver3StoredFileName());
-        //System.out.println("도착지 : " + boardDTO.getBoardFileDestinationStoredFileName());
-        System.out.println("\n============\n");
         challengeSaveFormDTO = toTransformChallengeSaveFormDTO(boardDTO);
         return new ApiResponseDTO<>(OK, SUCCESS, "Challenge가 생성되었습니다.", null);
         //return "index";
