@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import swyg.vitalroutes.common.exception.MemberModifyException;
+import swyg.vitalroutes.common.exception.MemberSignUpException;
 import swyg.vitalroutes.member.domain.Member;
-import swyg.vitalroutes.member.domain.MemberModifyDTO;
-import swyg.vitalroutes.member.domain.MemberSaveDTO;
+import swyg.vitalroutes.member.dto.*;
 import swyg.vitalroutes.member.domain.SocialType;
 import swyg.vitalroutes.member.repository.MemberRepository;
-import swyg.vitalroutes.security.domain.SocialMemberDTO;
+import swyg.vitalroutes.security.dto.SocialMemberDTO;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -29,13 +29,23 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // 닉네임이 중복이면 true
-    public boolean duplicateNicknameCheck(String nickname) {
+    public void duplicateNicknameCheck(MemberNicknameDTO dto) {
+        String nickname = dto.getNickname();
+        if (nickname == null) {
+            throw new MemberSignUpException(BAD_REQUEST, FAIL, "닉네임이 전달되지 않았습니다");
+        }
+
         Optional<Member> byNickname = memberRepository.findByNickname(nickname);
-        return byNickname.isPresent();
+        if (byNickname.isPresent()) {
+            throw new MemberSignUpException(BAD_REQUEST, FAIL, "이미 존재하는 닉네임입니다");
+        }
     }
 
     public Member saveMember(MemberSaveDTO memberDTO) {
+        if (!memberDTO.getIsChecked()) {
+            throw new MemberSignUpException(BAD_REQUEST, FAIL, "닉네임 중복확인이 필요합니다");
+        }
+        
         Member member = Member.builder()
                 .name(memberDTO.getName())
                 .nickname(memberDTO.getNickname())
@@ -46,6 +56,10 @@ public class MemberService {
     }
 
     public Member saveSocialMember(SocialMemberDTO memberDTO) {
+        if (!memberDTO.getIsChecked()) {
+            throw new MemberSignUpException(BAD_REQUEST, FAIL, "닉네임 중복확인이 필요합니다");
+        }
+
         Member member = Member.builder()
                 .name(memberDTO.getName())
                 .nickname(memberDTO.getNickname())
@@ -56,15 +70,15 @@ public class MemberService {
     }
 
 
-    public Optional<Member> getMemberInfo(Long memberId) {
-        return memberRepository.findById(memberId);
+    public MemberModifyDTO getMemberInfo(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다"));
+        return MemberModifyDTO.entityToDto(member);
     }
 
     public void deleteMember(Long memberId) {
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-        if (optionalMember.isEmpty()) {
-            throw new NoSuchElementException();
-        }
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다"));
         memberRepository.deleteById(memberId);
     }
 
@@ -123,36 +137,42 @@ public class MemberService {
     }
 
 
-    public Member modifyProfileImage(Long memberId, String imageURL) {
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-        if (optionalMember.isEmpty()) {
-            throw new MemberModifyException(BAD_REQUEST, FAIL, "사용자가 존재하지 않습니다");
+    public MemberModifyDTO modifyProfileImage(Long memberId, MemberProfileImageDTO imageDTO) {
+        String profileImageURL = imageDTO.getProfileImageURL();
+        if (!StringUtils.hasText(profileImageURL)) {
+            throw new MemberModifyException(BAD_REQUEST, FAIL, "프로필 이미지가 전달되지 않았습니다");
         }
-        Member member = optionalMember.get();
-        member.setProfile(imageURL);
-        return member;
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다"));
+
+        member.setProfile(profileImageURL);
+        return MemberModifyDTO.entityToDto(member);
     }
 
-    public Optional<Member> findMemberByEmail(String email) {
-        return memberRepository.findByEmail(email);
+    public Member findMemberByEmail(MemberEmailDTO emailDTO) {
+        String email = emailDTO.getEmail();
+        if (!StringUtils.hasText(email)) {
+            throw new MemberModifyException(BAD_REQUEST, FAIL, "이메일이 전달되지 않았습니다");
+        }
+        return memberRepository.findByEmail(emailDTO.getEmail())
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 이메일입니다"));
     }
 
 
-    public void modifyPassword(Long memberId, String password) {
+    public void modifyPassword(Long memberId, MemberPasswordDTO passwordDTO) {
         // 사용자 존재하는지 다시 확인
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-        if (optionalMember.isEmpty()) {
-            throw new MemberModifyException(BAD_REQUEST, FAIL, "사용자가 존재하지 않습니다");
-        }
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다"));
 
         // 비밀번호 규칙을 준수하는지 확인
+        String password = passwordDTO.getPassword();
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$";
         boolean matches = password.matches(regex);
         if (!matches) {
             throw new MemberModifyException(BAD_REQUEST, FAIL, "비밀번호는 대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하여야 합니다");
         }
 
-        Member member = optionalMember.get();
         member.setPassword(passwordEncoder.encode(password));
     }
 

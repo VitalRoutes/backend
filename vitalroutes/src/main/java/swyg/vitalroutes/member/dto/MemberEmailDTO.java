@@ -1,4 +1,4 @@
-package swyg.vitalroutes.member.domain;
+package swyg.vitalroutes.member.dto;
 
 import lombok.Data;
 

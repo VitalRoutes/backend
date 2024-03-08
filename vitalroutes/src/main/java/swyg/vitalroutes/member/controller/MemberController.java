@@ -23,10 +23,11 @@ import swyg.vitalroutes.common.exception.MemberModifyException;
 import swyg.vitalroutes.common.exception.MemberSignUpException;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.member.domain.*;
+import swyg.vitalroutes.member.dto.*;
 import swyg.vitalroutes.member.service.MailService;
 import swyg.vitalroutes.member.service.MemberService;
 import swyg.vitalroutes.s3.S3UploadService;
-import swyg.vitalroutes.security.domain.SocialMemberDTO;
+import swyg.vitalroutes.security.dto.SocialMemberDTO;
 import swyg.vitalroutes.security.utils.JwtConstants;
 import swyg.vitalroutes.security.utils.JwtTokenProvider;
 
@@ -62,13 +63,10 @@ public class MemberController {
     })
     @PostMapping("/member/duplicateCheck")
     public ApiResponseDTO<?> duplicateCheck(@RequestBody MemberNicknameDTO dto) {
-        String nickname = dto.getNickname();
-        if (nickname == null) {
-            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "닉네임이 전달되지 않았습니다", null);
-        }
-        log.info("nickname = {}", nickname);
-        if (memberService.duplicateNicknameCheck(dto.getNickname())) {
-            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "이미 존재하는 닉네임입니다", null);
+        try {
+            memberService.duplicateNicknameCheck(dto);
+        } catch (MemberSignUpException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         }
         return new ApiResponseDTO<>(OK, SUCCESS, "닉네임 인증이 완료되었습니다", null);
     }
@@ -91,15 +89,13 @@ public class MemberController {
     @PostMapping("/member/signUp")
     public ApiResponseDTO<?> signUp(@Valid @RequestBody MemberSaveDTO memberDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new MemberSignUpException(BAD_REQUEST, FAIL, bindingResult.getFieldError().getDefaultMessage());
-        }
-
-        if (!memberDTO.getIsChecked()) {
-            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "닉네임 중복 확인이 필요합니다", null);
+            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, bindingResult.getFieldError().getDefaultMessage(), null);
         }
 
         try {
             memberService.saveMember(memberDTO);
+        } catch (MemberSignUpException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         } catch (DataIntegrityViolationException e) {
             return new ApiResponseDTO<>(CONFLICT, FAIL, "중복되는 닉네임 혹은 이메일이 존재합니다", null);
         } catch (Exception e) {
@@ -129,12 +125,10 @@ public class MemberController {
             throw new MemberSignUpException(BAD_REQUEST, FAIL, bindingResult.getFieldError().getDefaultMessage());
         }
 
-        if (!memberDTO.getIsChecked()) {
-            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "닉네임 중복 확인이 필요합니다", null);
-        }
-
         try {
             memberService.saveSocialMember(memberDTO);
+        } catch (MemberSignUpException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         } catch (DataIntegrityViolationException e) {
             return new ApiResponseDTO<>(CONFLICT, FAIL, "중복되는 닉네임이 존재합니다", null);
         } catch (Exception e) {
@@ -157,11 +151,13 @@ public class MemberController {
     })
     @GetMapping("/member/profile/{memberId}")
     public ApiResponseDTO<?> viewMemberInfo(@PathVariable Long memberId) {
-        Optional<Member> optionalMember = memberService.getMemberInfo(memberId);
-        if (optionalMember.isEmpty()) {
-            return new ApiResponseDTO<>(NOT_FOUND, FAIL, "존재하지 않는 회원입니다", null);
+        MemberModifyDTO memberModifyDTO = null;
+        try {
+            memberModifyDTO = memberService.getMemberInfo(memberId);
+        } catch (NoSuchElementException exception) {
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, exception.getMessage(), null);
         }
-        return new ApiResponseDTO<>(OK, SUCCESS, null, MemberModifyDTO.entityToDto(optionalMember.get()));
+        return new ApiResponseDTO<>(OK, SUCCESS, null, memberModifyDTO);
     }
 
 
@@ -213,7 +209,7 @@ public class MemberController {
         try {
             memberService.deleteMember(memberId);
         } catch (NoSuchElementException exception) {
-            return new ApiResponseDTO<>(NOT_FOUND, FAIL, "존재하지 않는 회원입니다", null);
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, exception.getMessage(), null);
         }
         return new ApiResponseDTO<>(OK, SUCCESS, "회원탈퇴가 완료되었습니다", null);
     }
@@ -257,13 +253,15 @@ public class MemberController {
     })
     @PatchMapping("/member/profile/image/{memberId}")
     public ApiResponseDTO<?> modifyProfileImage(@PathVariable Long memberId, MemberProfileImageDTO imageDTO) {
-        log.info("imageDTO = {}", imageDTO);
-        String profileImageURL = imageDTO.getProfileImageURL();
-        if (!StringUtils.hasText(profileImageURL)) {
-            return new ApiResponseDTO<>(BAD_REQUEST, FAIL, "프로필 이미지가 전달되지 않았습니다", null);
+        MemberModifyDTO memberModifyDTO = null;
+        try {
+            memberModifyDTO = memberService.modifyProfileImage(memberId, imageDTO);
+        } catch (MemberModifyException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+        } catch (NoSuchElementException exception) {
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, exception.getMessage(), null);
         }
-        Member member = memberService.modifyProfileImage(memberId, profileImageURL);
-        return new ApiResponseDTO<>(OK, SUCCESS, "프로필 이미지 수정이 완료되었습니다", MemberModifyDTO.entityToDto(member));
+        return new ApiResponseDTO<>(OK, SUCCESS, "프로필 이미지 수정이 완료되었습니다", memberModifyDTO);
     }
 
 
@@ -287,31 +285,28 @@ public class MemberController {
     })
     @PostMapping("/member/password")
     public ApiResponseDTO<?> sendPasswordEmail(@RequestBody MemberEmailDTO emailDTO) {
-        String email = emailDTO.getEmail();
-        log.info("email = {}", email);
-        Optional<Member> optionalMember = memberService.findMemberByEmail(email);
-        if (optionalMember.isEmpty()) {
-            return new ApiResponseDTO<>(NOT_FOUND, FAIL, "존재하지 않는 이메일입니다", null);
-        }
-        Member member = optionalMember.get();
-
-        Map<String, Object> memberInfo = new HashMap<>();
-        memberInfo.put("memberId", member.getMemberId());
-        memberInfo.put("email", member.getEmail());
-        String token = jwtTokenProvider.generateToken(memberInfo, 5);  // 재설정 링크는 5분 동안 유효
-
-        StringBuffer sb = new StringBuffer();
-        sb.append("http://localhost:8080/member/password/");    // 프론트 배포 후에 변경 필요
-        sb.append(token);
-        String url = sb.toString();
-
-        // 메일 전송
         try {
+            Member member = memberService.findMemberByEmail(emailDTO);
+
+            Map<String, Object> memberInfo = new HashMap<>();
+            memberInfo.put("memberId", member.getMemberId());
+            memberInfo.put("email", member.getEmail());
+            String token = jwtTokenProvider.generateToken(memberInfo, 5);  // 재설정 링크는 5분 동안 유효
+
+            StringBuffer sb = new StringBuffer();
+            sb.append("http://localhost:8080/member/password/");    // 프론트 배포 후에 변경 필요
+            sb.append(token);
+            String url = sb.toString();
+
+            String email = emailDTO.getEmail();
             mailService.sendEmail(member.getName(), email, url);
+        } catch (MemberModifyException exception) {
+            return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
+        } catch (NoSuchElementException exception) {
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, exception.getMessage(), null);
         } catch (MessagingException exception) {
             return new ApiResponseDTO<>(INTERNAL_SERVER_ERROR, ERROR, "이메일 전송에 실패하였습니다", null);
         }
-        
         return new ApiResponseDTO<>(OK, SUCCESS, "비밀번호 재설정 링크가 전송되었습니다", null);
     }
 
@@ -329,14 +324,14 @@ public class MemberController {
     })
     @PatchMapping("/member/password/{token}")
     public ApiResponseDTO<?> modifyPassword(@PathVariable String token, @RequestBody MemberPasswordDTO passwordDTO) {
-        log.info("token = {}", token);
-        log.info("password = {}", passwordDTO.getPassword());
         try {
             Map<String, Object> tokenValue = jwtTokenProvider.validateToken(token);
             Long memberId = Long.valueOf(String.valueOf(tokenValue.get("memberId")));// 어떤 회원 비밀번호를 변경할지 알게 해주는 데이터
-            memberService.modifyPassword(memberId, passwordDTO.getPassword());
+            memberService.modifyPassword(memberId, passwordDTO);
         } catch (JwtTokenException exception) {
             return new ApiResponseDTO<>(NOT_FOUND, FAIL, "올바르지 않은 비밀번호 설정 링크입니다", null);
+        } catch (NoSuchElementException exception) {
+            return new ApiResponseDTO<>(NOT_FOUND, FAIL, exception.getMessage(), null);
         }
         return new ApiResponseDTO<>(OK, SUCCESS, "비밀번호 변경이 완료되었습니다", null);
     }
