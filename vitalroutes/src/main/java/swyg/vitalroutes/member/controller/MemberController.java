@@ -294,7 +294,7 @@ public class MemberController {
             String token = jwtTokenProvider.generateToken(memberInfo, 5);  // 재설정 링크는 5분 동안 유효
 
             StringBuffer sb = new StringBuffer();
-            sb.append("http://localhost:8080/member/password/");    // 프론트 배포 후에 변경 필요
+            sb.append("https://vital-routes.vercel.app/member/password/");
             sb.append(token);
             String url = sb.toString();
 
