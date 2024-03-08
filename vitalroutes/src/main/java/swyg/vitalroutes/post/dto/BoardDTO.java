@@ -123,16 +123,9 @@ public class BoardDTO {
             boardDTO.setFileAttached(boardEntity.getFileAttached()); // 0
         } else { // 파일 있다면
             boardDTO.setFileAttached(boardEntity.getFileAttached()); // 1
-            // 파일 이름을 가져가야 함.
-            // originalFileName, storedFileName : board_file_table에 있다.(BoardFileEntity)
-            // (BoardFileEntity)을 찾기 위해 join 문법 사용
-            // select * from board_table b, board_file_table bf where b.id=bf.board_id
-            // and where b.id=?
-            System.out.println("DTO탐색 ====> " + boardEntity.getBoardFileEntity());
             // 대표사진
             boardDTO.setOriginalTitleImageName(boardEntity.getBoardFileEntity().getOriginalFileName());
             boardDTO.setStoredTitleImageName(boardEntity.getBoardFileEntity().getStoredFileName());
-
 
             // 출발지 사진
             boardDTO.setOriginalStartingPositionImageName(boardEntity.getBoardFileEntity()
@@ -146,7 +139,7 @@ public class BoardDTO {
             boardDTO.setStoredDestinationImageName(boardEntity.getBoardFileEntity()
                     .getBoardPathImageEntityList().get(0).getStoredFileName());
 
-            int mode = boardEntity.getBoardFileEntity().getFileAttached();
+            int mode = boardEntity.getBoardFileEntity().getExistingPathImage();
             if((mode & 0B01000) == 0B01000){ // 경유지 1
                 boardDTO.setOriginalStopOverImage1Name(boardEntity.getBoardFileEntity()
                         .getBoardPathImageEntityList().get(0).getStoredFileName());
