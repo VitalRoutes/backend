@@ -224,10 +224,11 @@ public class BoardService {
                                  int locationOnRoute) throws IOException, ImageProcessingException, URISyntaxException {
         String originalFilename = pathImageFile.getOriginalFilename(); // 2.
         String savePath = s3UploadService.saveChallengePathImage(pathImageFile);
-        System.out.println("save path : " + savePath);
+        //System.out.println("save path : " + savePath);
+        log.info("save path : " + savePath);
         String storedFileName = System.currentTimeMillis() + "_" + originalFilename; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-        String saveServerPath = "C:/springboot_img/path/" + originalFilename; // 4.
-        //String saveServerPath = "/home/ubuntu/dev/image_resource_dummy/" + originalFilename; // 4.
+        //String saveServerPath = "C:/springboot_img/path/" + originalFilename; // 4.
+        String saveServerPath = "/home/ubuntu/dev/image_resource_dummy/" + originalFilename; // 4.
         pathImageFile.transferTo(new File(saveServerPath)); // 5.
 
         File imageFile = new File(saveServerPath); // 위도 경도
