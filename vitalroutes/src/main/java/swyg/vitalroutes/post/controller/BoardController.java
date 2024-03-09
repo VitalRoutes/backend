@@ -19,6 +19,7 @@ import swyg.vitalroutes.post.service.BoardService;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -93,13 +94,24 @@ public class BoardController {
         return boardDTO;
     }
 
+    @Operation(summary = "챌린지 목록 조회", description = "지금까지 등록된 챌린지 목록입니다.")
+    @ApiResponse(responseCode = "200", description = "챌린지 조회 완료")
     @GetMapping("/")
-    public String findAll(Model model) { // 게시글 목록을 db로 부터 가져와야한다. DB로부터 data를 가져올때는 Model 객체를 사용한다.
+    public ApiResponseDTO<?> findAll(Model model) {
+    //public String findAll(Model model) { // 게시글 목록을 db로 부터 가져와야한다. DB로부터 data를 가져올때는 Model 객체를 사용한다.
         // DB에서 전체 게시글 데이터를 가져와서 list.html에 보여준다.
         //System.out.println("\n============\nlist.html로 이동\n============\n");
         List<BoardDTO> boardDTOList = boardService.findAll(); // 게시글 "목록"을 가져온다.
-        model.addAttribute("boardList", boardDTOList); // 가져온 객체를 model객체에 담아둔다.
-        return "list"; // list.html로 간다.
+        List<ChallengeSaveFormDTO> challengeSaveFormDTOList = new ArrayList<ChallengeSaveFormDTO>();
+
+        for(BoardDTO curDto : boardDTOList){
+            ChallengeSaveFormDTO challengeSaveFormDTO = toTransformChallengeSaveFormDTO(curDto);
+            challengeSaveFormDTOList.add(challengeSaveFormDTO);
+        }
+
+        //model.addAttribute("boardList", boardDTOList); // 가져온 객체를 model객체에 담아둔다.
+        //return "list"; // list.html로 간다.
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeSaveFormDTOList);
     }
 
     @GetMapping("/{id}")
