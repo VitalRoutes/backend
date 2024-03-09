@@ -49,6 +49,7 @@ public class MemberService {
         Member member = Member.builder()
                 .name(memberDTO.getName())
                 .nickname(memberDTO.getNickname())
+                .profile("https://vital-routes-bucket.s3.ap-northeast-2.amazonaws.com/b8c3384d-22f3-4865-88d1-0fc2a2866e7bprofile.png") // 디폴트 이미지
                 .email(memberDTO.getEmail())
                 .password(passwordEncoder.encode(memberDTO.getPassword()))
                 .build();
