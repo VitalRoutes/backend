@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
 import swyg.vitalroutes.member.dto.MemberNicknameDTO;
 import swyg.vitalroutes.post.dto.BoardDTO;
+import swyg.vitalroutes.post.dto.ChallengeCheckDTO;
+import swyg.vitalroutes.post.dto.ChallengeCheckListDTO;
 import swyg.vitalroutes.post.dto.ChallengeSaveFormDTO;
 import swyg.vitalroutes.post.service.BoardService;
 import swyg.vitalroutes.s3.S3UploadService;
@@ -33,7 +35,6 @@ import static swyg.vitalroutes.common.response.ResponseType.SUCCESS;
 @RequestMapping("/board") // 부모 주소 자동 입력
 public class BoardController {
     private final BoardService boardService; // 생성자 주입방식으로 의존성 주입받음
-    private final S3UploadService s3DownloadService;
 
     @GetMapping("/save") // 자식 주소 매핑
     public String saveForm() {
@@ -101,43 +102,29 @@ public class BoardController {
     @ApiResponse(responseCode = "200", description = "챌린지 조회 완료")
     @GetMapping("/")
     public ApiResponseDTO<?> findAll(Model model) {
-    //public String findAll(Model model) { // 게시글 목록을 db로 부터 가져와야한다. DB로부터 data를 가져올때는 Model 객체를 사용한다.
-        // DB에서 전체 게시글 데이터를 가져와서 list.html에 보여준다.
-        //System.out.println("\n============\nlist.html로 이동\n============\n");
         List<BoardDTO> boardDTOList = boardService.findAll(); // 게시글 "목록"을 가져온다.
-        List<ChallengeSaveFormDTO> challengeSaveFormDTOList = new ArrayList<ChallengeSaveFormDTO>();
+        List<ChallengeCheckListDTO> challengeCheckListDTOList = new ArrayList<ChallengeCheckListDTO>();
 
-
-        //challengeSaveFormDTOList = getChallengeSaveFormDTOList(boardDTOList);
-        for(BoardDTO curDto : boardDTOList){
-            ChallengeSaveFormDTO challengeSaveFormDTO = toTransformChallengeSaveFormDTO(curDto);
-            challengeSaveFormDTOList.add(challengeSaveFormDTO);
+        for(BoardDTO boardDTO : boardDTOList){
+            ChallengeCheckListDTO challengeCheckListDTO = new ChallengeCheckListDTO();
+            challengeCheckListDTO = getChallengeCheckListDTO(boardDTO);
+            challengeCheckListDTOList.add(challengeCheckListDTO);
         }
 
-
-        //model.addAttribute("boardList", boardDTOList); // 가져온 객체를 model객체에 담아둔다.
-        //return "list"; // list.html로 간다.
-        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeSaveFormDTOList);
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeCheckListDTOList);
     }
 
-    private List<ChallengeSaveFormDTO> getChallengeSaveFormDTOList(List<BoardDTO> boardDTOList) {
-        List<ChallengeSaveFormDTO> challengeSaveFormDTOList = new ArrayList<ChallengeSaveFormDTO>();
-
+    private ChallengeCheckListDTO getChallengeCheckListDTO(BoardDTO boardDTO) {
         /*
-        갔다와서 해보기
-        for(BoardDTO curDto : boardDTOList){
-            ChallengeSaveFormDTO challengeSaveFormDTO = new ChallengeSaveFormDTO();
+        챌린지 목록을 조회하기 위한 데이터 전송
+         */
+        ChallengeCheckListDTO challengeCheckListDTO = new ChallengeCheckListDTO();
 
-            challengeSaveFormDTO.setChallengeWriter(curDto.getBoardWriter());
-            challengeSaveFormDTO.setChallengeTitle(curDto.getBoardTitle());
-            challengeSaveFormDTO.setChallengeContents(curDto.getBoardContents());
-            challengeSaveFormDTO.setChallengeTransportation(curDto.getBoardTransportation());
-            //challengeSaveFormDTO.setTitleImage(s3DownloadService.getFileURI(curDto.getStoredTitleImageName()));
+        challengeCheckListDTO.setChallengeTitle(boardDTO.getBoardTitle());
+        challengeCheckListDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
+        challengeCheckListDTO.setBoardParty(0); // 참여 인원은일단 0세팅
 
-        }
-     */
-
-        return challengeSaveFormDTOList;
+        return challengeCheckListDTO;
     }
 
     @Operation(summary = "{id}에 해당하는 챌린지 상세 조회", description = "{id}에 해당하는 챌린지입니다.")
@@ -157,12 +144,50 @@ public class BoardController {
         boardService.updateHits(id);
         BoardDTO boardDTO = boardService.findById(id);
 
-        ChallengeSaveFormDTO challengeSaveFormDTO = toTransformChallengeSaveFormDTO(boardDTO);
+        ChallengeCheckDTO challengeCheckDTO = getChallengeCheckDTO(boardDTO);
         //model.addAttribute("board", boardDTO);
         //model.addAttribute("page", pageable.getPageNumber());
         //return "detail";
         //return boardDTO;
-        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeSaveFormDTO);
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeCheckDTO);
+    }
+
+    private ChallengeCheckDTO getChallengeCheckDTO(BoardDTO boardDTO) {
+        ChallengeCheckDTO challengeCheckDTO = new ChallengeCheckDTO();
+
+        challengeCheckDTO.setChallengeWriter(boardDTO.getBoardWriter());
+        challengeCheckDTO.setChallengeTitle(boardDTO.getBoardTitle());
+        challengeCheckDTO.setChallengeContents(boardDTO.getBoardContents());
+        challengeCheckDTO.setChallengeTransportation(boardDTO.getBoardTransportation());
+        challengeCheckDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
+        challengeCheckDTO.setStoredStartingPositionImageName(boardDTO.getStoredStartingPositionImageName());
+        challengeCheckDTO.setStoredDestinationImageName(boardDTO.getStoredDestinationImageName());
+
+        int existingMode = boardService.findExistingModeById(boardDTO.getId());
+        challengeCheckDTO.setExistingMode(existingMode);
+
+        if((existingMode & 0B01000) == 0B01000){
+            challengeCheckDTO.setStoredStopOverImage1Name(boardDTO.getStoredStopOverImage1Name());
+        }
+        else {
+            challengeCheckDTO.setStoredStopOverImage1Name(null);
+        }
+
+        if((existingMode & 0B00100) == 0B00100){
+            challengeCheckDTO.setStoredStopOverImage2Name(boardDTO.getStoredStopOverImage2Name());
+        }
+        else {
+            challengeCheckDTO.setStoredStopOverImage2Name(null);
+        }
+
+        if((existingMode & 0B00010) == 0B00010){
+            challengeCheckDTO.setStoredStopOverImage3Name(boardDTO.getStoredStopOverImage3Name());
+        }
+        else {
+            challengeCheckDTO.setStoredStopOverImage3Name(null);
+        }
+
+        return challengeCheckDTO;
     }
 
     @GetMapping("/update/{id}")

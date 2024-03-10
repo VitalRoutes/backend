@@ -151,6 +151,18 @@ public class BoardService {
         }
     }
 
+    @Transactional
+    public int findExistingModeById(Long id) {
+        Optional<BoardEntity> optionalBoardEntity = boardRepository.findById(id);
+        if (optionalBoardEntity.isPresent()) { // .isPresent() 객체가 값을 가지고 있으면 True, 없으면 false
+            BoardEntity boardEntity = optionalBoardEntity.get();
+            int existingMode = boardEntity.getBoardFileEntity().getExistingPathImage();
+            return existingMode;
+        } else { // 객체에 값이 없다면 null
+            return 0;
+        }
+    }
+
     public BoardDTO update(BoardDTO boardDTO) {
         /*
             jpa에서 update를 위한 method가 없다.

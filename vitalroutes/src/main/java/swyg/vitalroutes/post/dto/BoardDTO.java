@@ -46,6 +46,7 @@ public class BoardDTO {
     //@Schema(description = "Challenge 대표사진있으면 1, 없으면 0. 이번 프로젝트에선 항상 있을(1) 예정")
     private int fileAttached; // 파일 첨부 여부(첨부 1, 미첨부 0)
 
+    private int pathFileAttached; // 파일 첨부 여부(첨부 1, 미첨부 0)
     @Schema(description = "Challenge 이동 경로 사진 중 출발지 사진 파일을 담는 변수")
     private MultipartFile startingPositionImage; // 출발지 이미지 파일 담는용도
     //@Schema(description = "Challenge 출발지 사진 파일명을 담는 변수")
@@ -127,6 +128,7 @@ public class BoardDTO {
             boardDTO.setOriginalTitleImageName(boardEntity.getBoardFileEntity().getOriginalFileName());
             boardDTO.setStoredTitleImageName(boardEntity.getBoardFileEntity().getStoredFileName());
 
+            int pathImageCnt = boardEntity.getBoardFileEntity().getBoardPathImageEntityList().size(); // 이미지 갯수 카운트
             // 출발지 사진
             boardDTO.setOriginalStartingPositionImageName(boardEntity.getBoardFileEntity()
                     .getBoardPathImageEntityList().get(0).getOriginalFileName());
@@ -135,30 +137,44 @@ public class BoardDTO {
 
             // 도착지 사진
             boardDTO.setOriginalDestinationImageName(boardEntity.getBoardFileEntity()
-                    .getBoardPathImageEntityList().get(0).getOriginalFileName());
+                    .getBoardPathImageEntityList().get(1).getOriginalFileName());
             boardDTO.setStoredDestinationImageName(boardEntity.getBoardFileEntity()
-                    .getBoardPathImageEntityList().get(0).getStoredFileName());
+                    .getBoardPathImageEntityList().get(1).getStoredFileName());
 
             int mode = boardEntity.getBoardFileEntity().getExistingPathImage();
             if((mode & 0B01000) == 0B01000){ // 경유지 1
+                int idx = 0;
+                if(pathImageCnt == 3) { idx = 2; }
+                else if(pathImageCnt == 4) { idx = 2; }
+                else if(pathImageCnt == 5) { idx = 2; }
                 boardDTO.setOriginalStopOverImage1Name(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(0).getStoredFileName());
+                        .getBoardPathImageEntityList().get(idx).getOriginalFileName());
                 boardDTO.setStoredStopOverImage1Name(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(0).getStoredFileName());
+                        .getBoardPathImageEntityList().get(idx).getStoredFileName());
             }
             if((mode & 0B00100) == 0B00100){  // 경유지 2
+                int idx = 0;
+                if(pathImageCnt == 3) { idx = 2; }
+                else if(pathImageCnt == 4) { idx = 3; }
+                else if(pathImageCnt == 5) { idx = 3; }
                 boardDTO.setOriginalStopOverImage2Name(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(0).getStoredFileName());
+                        .getBoardPathImageEntityList().get(idx).getOriginalFileName());
                 boardDTO.setStoredStopOverImage2Name(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(0).getStoredFileName());
+                        .getBoardPathImageEntityList().get(idx).getStoredFileName());
             }
             if((mode & 0B00010) == 0B00010){  // 경유지 3
+                int idx = 0;
+                if(pathImageCnt == 3) { idx = 2; }
+                else if(pathImageCnt == 4) { idx = 3; }
+                else if(pathImageCnt == 5) { idx = 4; }
                 boardDTO.setOriginalStopOverImage3Name(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(0).getStoredFileName());
+                        .getBoardPathImageEntityList().get(idx).getOriginalFileName());
                 boardDTO.setStoredStopOverImage3Name(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(0).getStoredFileName());
+                        .getBoardPathImageEntityList().get(idx).getStoredFileName());
             }
+            //boardDTO.setPathFileAttached(mode);
         }
+
         return boardDTO;
     }
 }
