@@ -16,11 +16,9 @@ import swyg.vitalroutes.member.dto.MemberNicknameDTO;
 import swyg.vitalroutes.post.dto.BoardDTO;
 import swyg.vitalroutes.post.dto.ChallengeSaveFormDTO;
 import swyg.vitalroutes.post.service.BoardService;
-import swyg.vitalroutes.s3.S3UploadService;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -33,8 +31,6 @@ import static swyg.vitalroutes.common.response.ResponseType.SUCCESS;
 @RequestMapping("/board") // 부모 주소 자동 입력
 public class BoardController {
     private final BoardService boardService; // 생성자 주입방식으로 의존성 주입받음
-    private final S3UploadService s3DownloadService;
-
     @GetMapping("/save") // 자식 주소 매핑
     public String saveForm() {
         System.out.println("\n============\nsave.html로 이동\n============\n");
@@ -97,72 +93,33 @@ public class BoardController {
         return boardDTO;
     }
 
-    @Operation(summary = "챌린지 목록 조회", description = "지금까지 등록된 챌린지 목록입니다.")
-    @ApiResponse(responseCode = "200", description = "챌린지 조회 완료")
     @GetMapping("/")
-    public ApiResponseDTO<?> findAll(Model model) {
-    //public String findAll(Model model) { // 게시글 목록을 db로 부터 가져와야한다. DB로부터 data를 가져올때는 Model 객체를 사용한다.
+    public String findAll(Model model) { // 게시글 목록을 db로 부터 가져와야한다. DB로부터 data를 가져올때는 Model 객체를 사용한다.
         // DB에서 전체 게시글 데이터를 가져와서 list.html에 보여준다.
         //System.out.println("\n============\nlist.html로 이동\n============\n");
         List<BoardDTO> boardDTOList = boardService.findAll(); // 게시글 "목록"을 가져온다.
-        List<ChallengeSaveFormDTO> challengeSaveFormDTOList = new ArrayList<ChallengeSaveFormDTO>();
-
-
-        //challengeSaveFormDTOList = getChallengeSaveFormDTOList(boardDTOList);
-        for(BoardDTO curDto : boardDTOList){
-            ChallengeSaveFormDTO challengeSaveFormDTO = toTransformChallengeSaveFormDTO(curDto);
-            challengeSaveFormDTOList.add(challengeSaveFormDTO);
-        }
-
-
-        //model.addAttribute("boardList", boardDTOList); // 가져온 객체를 model객체에 담아둔다.
-        //return "list"; // list.html로 간다.
-        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeSaveFormDTOList);
+        model.addAttribute("boardList", boardDTOList); // 가져온 객체를 model객체에 담아둔다.
+        return "list"; // list.html로 간다.
     }
 
-    private List<ChallengeSaveFormDTO> getChallengeSaveFormDTOList(List<BoardDTO> boardDTOList) {
-        List<ChallengeSaveFormDTO> challengeSaveFormDTOList = new ArrayList<ChallengeSaveFormDTO>();
-
-        /*
-        갔다와서 해보기
-        for(BoardDTO curDto : boardDTOList){
-            ChallengeSaveFormDTO challengeSaveFormDTO = new ChallengeSaveFormDTO();
-
-            challengeSaveFormDTO.setChallengeWriter(curDto.getBoardWriter());
-            challengeSaveFormDTO.setChallengeTitle(curDto.getBoardTitle());
-            challengeSaveFormDTO.setChallengeContents(curDto.getBoardContents());
-            challengeSaveFormDTO.setChallengeTransportation(curDto.getBoardTransportation());
-            //challengeSaveFormDTO.setTitleImage(s3DownloadService.getFileURI(curDto.getStoredTitleImageName()));
-
-        }
-     */
-
-        return challengeSaveFormDTOList;
-    }
-
-    @Operation(summary = "{id}에 해당하는 챌린지 상세 조회", description = "{id}에 해당하는 챌린지입니다.")
-    @ApiResponse(responseCode = "200", description = "{id}에 해당하는 챌린지 상세 조회 완료")
     @GetMapping("/{id}")
     /*
+    public String findById(@PathVariable("id") Long id, Model model, // 경로상의 값을 가져올때는 @PathVariable를 사용
+                           @PageableDefault(page=1) Pageable pageable) {
+     */
     public BoardDTO findById(@PathVariable("id") Long id, Model model, // 경로상의 값을 가져올때는 @PathVariable를 사용
                             @PageableDefault(page=1) Pageable pageable) {
-     */
-    public ApiResponseDTO<?> findById(@PathVariable("id") Long id, Model model, // 경로상의 값을 가져올때는 @PathVariable를 사용
-                             @PageableDefault(page=1) Pageable pageable) {
         /*
             해당 게시글의 조회수를 하나 올리고
             게시글 데이터를 가져와서 detail.html에 출력
          */
-        //System.out.println("\n============\ndetail.html로 이동\n============\n");
+        System.out.println("\n============\ndetail.html로 이동\n============\n");
         boardService.updateHits(id);
         BoardDTO boardDTO = boardService.findById(id);
-
-        ChallengeSaveFormDTO challengeSaveFormDTO = toTransformChallengeSaveFormDTO(boardDTO);
-        //model.addAttribute("board", boardDTO);
-        //model.addAttribute("page", pageable.getPageNumber());
+        model.addAttribute("board", boardDTO);
+        model.addAttribute("page", pageable.getPageNumber());
         //return "detail";
-        //return boardDTO;
-        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeSaveFormDTO);
+        return boardDTO;
     }
 
     @GetMapping("/update/{id}")
