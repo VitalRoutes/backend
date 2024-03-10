@@ -15,5 +15,5 @@ public class DataWithCount<T> {
     boolean remainFlag; // 현재까지 보여지고 있는 데이터 외에 남은 데이터가 있는지
 
     @Schema(description = "요청한 정보들이 들어가는 필드")
-    private T data;
+    private T comments;
 }

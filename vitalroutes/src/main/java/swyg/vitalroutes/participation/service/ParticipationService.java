@@ -19,11 +19,13 @@ import swyg.vitalroutes.participation.domain.Participation;
 import swyg.vitalroutes.participation.dto.*;
 import swyg.vitalroutes.participation.repository.ParticipationRepository;
 import swyg.vitalroutes.post.entity.BoardEntity;
+import swyg.vitalroutes.post.entity.BoardPathImageEntity;
+import swyg.vitalroutes.post.repository.BoardPathImageRepository;
 import swyg.vitalroutes.post.repository.BoardRepository;
 import swyg.vitalroutes.s3.S3UploadService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 import static org.springframework.http.HttpStatus.*;
 import static swyg.vitalroutes.common.response.ResponseType.*;
@@ -73,28 +75,51 @@ public class ParticipationService {
 
 
     public void saveParticipation(Long memberId, ParticipationSaveDTO saveDTO) {
-        List<ParticipationImage> participationImages = new ArrayList<>();
-        List<MultipartFile> files = saveDTO.getFiles();
-        int seq = 0;
-
-        /**
-         * 아래 반복문 안에서 Board 의 Location 과 비교 필요
-         */
-        
-        for (MultipartFile file : files) {
-            String fileName = "file image url";
-            // String fileName = s3UploadService.saveFile(file);
-            double[] locationInfo = FileUtils.getLocationInfo(file);
-            participationImages.add(ParticipationImage.createParticipationImage(++seq, fileName));
-        }
-
         // 거치지 않아도 되지만 DB 에서 조회하는 걸로 남김
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "사용자가 존재하지 않습니다"));
         BoardEntity board = boardRepository.findById(saveDTO.getBoardId())
                 .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "게시글이 존재하지 않습니다"));
 
+        List<BoardPathImageEntity> boardPathImageEntityList = board.getBoardFileEntity().getBoardPathImageEntityList();
+        // 도착지를 먼저 저장하시니...내가 정렬을 해야지...;;
+        boardPathImageEntityList.sort(Comparator.comparing(BoardPathImageEntity::getLocationOnRoute));
+        log.info("boardPathImageEntityList size = {}", boardPathImageEntityList.size());
+        for (BoardPathImageEntity boardPathImageEntity : boardPathImageEntityList) {
+            System.out.println("boardPathImageEntity.getLocationOnRoute() = " + boardPathImageEntity.getLocationOnRoute());
+        }
+        
+        List<MultipartFile> files = saveDTO.getFiles(); // 전달 받은 이미지 파일
 
+        if (boardPathImageEntityList.size() != files.size()) {
+            throw new ParticipationException(BAD_REQUEST, FAIL, "게시글과 동일한 개수의 이미지를 업로드해주세요");
+        }
+
+        List<ParticipationImage> participationImages = new ArrayList<>();
+        int seq = 0;
+        
+        
+        for (MultipartFile file : files) {
+            double[] locationInfo = FileUtils.getLocationInfo(file);
+
+            // 거리 비교
+            double latitude = boardPathImageEntityList.get(seq).getLatitude();
+            double longitude = boardPathImageEntityList.get(seq).getLongitude();
+            double distance = FileUtils.calDistance(locationInfo[0], locationInfo[1], latitude, longitude);
+            log.info(seq + "번째 지점 distance = {}", distance);
+            if (distance > 5) {
+                throw new ParticipationException(BAD_REQUEST, FAIL, (seq + 1) + "번째 지점의 거리가 멀리 떨어져있습니다. 챌린지 지점과의 거리는 5m 이하여야 합니다. 현재거리 = " + (int) distance + "m");
+            }
+            // 이상 없으면 업로드 진행
+            String fileName = "";
+            try {
+                fileName = s3UploadService.saveFile(file);
+            } catch (IOException e) {
+                throw new ParticipationException(INTERNAL_SERVER_ERROR, FAIL, "파일 업로드 중 에러가 발생하였습니다");
+            }
+            participationImages.add(ParticipationImage.createParticipationImage(++seq, fileName));
+        }
+        
         Participation participation = Participation.createParticipation(saveDTO.getContent(), member, board, participationImages);
         participationRepository.save(participation);
     }
@@ -117,24 +142,33 @@ public class ParticipationService {
      * 2. 변경할 이미지 없이 내용만 변경된다면 내용을 변경하는 API 를 호출한다
      */
     public ImageResponseDTO uploadImage(ImageSaveDTO imageDTO) {
+        Long boardId = imageDTO.getBoardId();
+        int sequence = imageDTO.getSequence();
+
+        BoardEntity board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "게시글이 존재하지 않습니다"));
+        List<BoardPathImageEntity> boardPathImageEntityList = board.getBoardFileEntity().getBoardPathImageEntityList();
+        // 도착지를 먼저 저장하시니...내가 정렬을 해야지...;;
+        boardPathImageEntityList.sort(Comparator.comparing(BoardPathImageEntity::getLocationOnRoute));
+        double latitude = boardPathImageEntityList.get(sequence - 1).getLatitude();
+        double longitude = boardPathImageEntityList.get(sequence - 1).getLongitude();
+
         String url = "modifyURL";
         MultipartFile file = imageDTO.getFile();
         double[] locationInfo = FileUtils.getLocationInfo(file);
 
-        /**
-         * 여기서 Board 이미지의 위치정보와 비교
-         * 위치정보가 유사하다면 OK
-         */
-        Long boardId = imageDTO.getBoardId();
-        int sequence = imageDTO.getSequence();
-
-        /*
+        double distance = FileUtils.calDistance(locationInfo[0], locationInfo[1], latitude, longitude);
+        log.info(sequence + "번째 지점 distance = {}", distance);
+        if (distance > 5) {
+            throw new ParticipationException(BAD_REQUEST, FAIL, sequence + "번째 지점의 거리가 멀리 떨어져있습니다. 챌린지 지점과의 거리는 5m 이하여야 합니다. 현재거리 = " + (int) distance + "m");
+        }
+        
         try {
             url = s3UploadService.saveFile(file);
         } catch (IOException exception) {
             throw new ParticipationException(INTERNAL_SERVER_ERROR, FAIL, "파일 업로드 중 에러가 발생하였습니다");
         }
-        */
+        
         return new ImageResponseDTO(sequence, url);
     }
 
