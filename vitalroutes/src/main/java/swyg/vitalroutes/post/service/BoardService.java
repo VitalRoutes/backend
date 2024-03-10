@@ -5,7 +5,6 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.GpsDirectory;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +27,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.slf4j.Logger;
-//import java.util.logging.Logger;
 
 // service에서 일어나는 작업
 // Controller -> (DTO -> Entity) -> Repository (entity class에서 이루어질 작업)
@@ -44,30 +41,25 @@ public class BoardService {
     private final BoardFileRepository boardFileRepository; // 생성자 주입방식으로 의존성 주입받음
     private final BoardPathImageRepository boardPathImageRepository; // 생성자 주입방식으로 의존성 주입받음
     private final S3UploadService s3UploadService;
-    private final Logger log = (Logger) LoggerFactory.getLogger((getClass()));
 
     @Transactional
     //public void save(BoardDTO boardDTO) throws IOException, ImageProcessingException {
     public void save(BoardDTO boardDTO) throws IOException, ImageProcessingException, URISyntaxException {
         // DTO -> Entity로 옮겨 담음
-        //System.out.println("Saving..... ------------------------------------------------>");
-        log.info("Saving..... ------------------------------------------------>");
+        System.out.println("Saving..... ------------------------------------------------>");
         // 파일 첨부 여부에 따라 로직분리
         if(boardDTO.getTitleImage().isEmpty()){
             // 첨부 파일이 파일이 없음
-            //System.out.println("Title Image is null");
-            log.info("Title Image is null");
+            System.out.println("Title Image is null");
             BoardEntity boardEntity = BoardEntity.toSaveEntity(boardDTO);
             boardRepository.save(boardEntity); // DB에 insert, save()는 entity클래스를 입력받고 반환한다
         } else{
-            //System.out.println("saved Title Image");
-            log.info("saved Title Image");
+            System.out.println("saved Title Image");
             // 대표사진 파일 저장---------------------------
             MultipartFile titleImage = boardDTO.getTitleImage(); // 1. DTO에 담긴 파일 꺼냄
             String originalFilename = titleImage.getOriginalFilename(); // 2. 파일의 이름을 가져옴
             String savePath = s3UploadService.saveChallengeTitleImage(titleImage);
-            //System.out.println("save path : " + savePath);
-            log.info("save path : " + savePath);
+            System.out.println("save path : " + savePath);
             //titleImage.transferTo(new File(savePath)); // 5. 해당 경로에 파일 저장
             // DB 저장------------------------------
             BoardEntity boardEntity = BoardEntity.toSaveFileEntity(boardDTO);
@@ -78,40 +70,35 @@ public class BoardService {
             boardFileRepository.save(boardFileEntity);
 
             // 출발지 파일 저장
-            //System.out.println("saved starting position");
-            log.info("saved starting position");
+            System.out.println("saved starting position");
             MultipartFile startingPositionImage = boardDTO.getStartingPositionImage();
             //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B10000); // 출발지 존재 여부
             boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 1));
             saved_path_image(boardDTO, boardFileEntity, startingPositionImage, 1);
 
             // 도착지 파일 저장
-            //System.out.println("saved destination");
-            log.info("saved destination");
+            System.out.println("saved destination");
             MultipartFile destinationImage = boardDTO.getDestinationImage();
             //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00001); // 도착지 존재 여부 체크
             boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 5));
             saved_path_image(boardDTO, boardFileEntity, destinationImage, 5);
 
             if(boardDTO.getStopOverImage1() != null) { // 경유지1이 있다면
-                //System.out.println("saved stopover 1");
-                log.info("saved stopover 1");
+                System.out.println("saved stopover 1");
                 MultipartFile stopOverImage1 = boardDTO.getStopOverImage1();
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B01000); // 경유지1 존재여부
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 2));
                 saved_path_image(boardDTO, boardFileEntity, stopOverImage1, 2);
             }
             if(boardDTO.getStopOverImage2() != null) { // 경유지2이 있다면
-                //System.out.println("saved stopover 2");
-                log.info("saved stopover 2");
+                System.out.println("saved stopover 2");
                 MultipartFile stopOverImage2 = boardDTO.getStopOverImage2();
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00100); // 경유지2 존재여부 체크
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 3));
                 saved_path_image(boardDTO, boardFileEntity, stopOverImage2, 3);
             }
-            if(boardDTO.getStopOverImage3() != null) { // 경유지3이 있다면
-                //System.out.println("saved stopover 3");
-                log.info("saved stopover 3");
+            if(boardDTO.getStopOverImage1() != null) { // 경유지1이 있다면
+                System.out.println("saved stopover 3");
                 MultipartFile stopOverImage3 = boardDTO.getStopOverImage3();
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00010); // 경유지3 존재여부 체크
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 4));
@@ -236,8 +223,7 @@ public class BoardService {
                                  int locationOnRoute) throws IOException, ImageProcessingException, URISyntaxException {
         String originalFilename = pathImageFile.getOriginalFilename(); // 2.
         String savePath = s3UploadService.saveChallengePathImage(pathImageFile);
-        //System.out.println("save path : " + savePath);
-        log.info("save path : " + savePath);
+        System.out.println("save path : " + savePath);
         String storedFileName = System.currentTimeMillis() + "_" + originalFilename; // 3. 시간을 밀리초로 바꾼 난수을 붙임
         //String saveServerPath = "C:/springboot_img/path/" + originalFilename; // 4.
         String saveServerPath = "/home/ubuntu/dev/image_resource_dummy/" + originalFilename; // 4.
