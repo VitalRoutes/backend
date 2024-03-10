@@ -149,7 +149,7 @@ public class BoardController {
         //model.addAttribute("page", pageable.getPageNumber());
         //return "detail";
         //return boardDTO;
-        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeCheckDTO);
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지가 조회되었습니다.", challengeCheckDTO);
     }
 
     private ChallengeCheckDTO getChallengeCheckDTO(BoardDTO boardDTO) {
