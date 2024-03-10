@@ -86,10 +86,4 @@ public class S3UploadService {
         amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
         return amazonS3.getUrl(bucket, originalFilename).toString();
     }
-
-    public S3Object getFileURI(String savePath) {
-        S3Object s3Object = amazonS3.getObject(bucket, savePath);
-        //S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
-        return  s3Object;
-    }
 }
