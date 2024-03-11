@@ -4,31 +4,48 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
-<div>
-    <img src="https://vital-routes-bucket.s3.ap-northeast-2.amazonaws.com/524e308b-04ca-4a6e-a0c5-1b4df43e8f18-logo.PNG" width="400">
+<body style="margin: 0; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333;">
+
+<div style="display: flex; width: 530px; padding: 62px 21px 100px 21px; flex-direction: column; align-items: flex-start; gap: 62px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+
+    <img src="https://vital-routes-bucket.s3.ap-northeast-2.amazonaws.com/524e308b-04ca-4a6e-a0c5-1b4df43e8f18-logo.PNG" width="200" style="margin-bottom: 20px;">
+
+    <div style="display: flex; align-items: flex-start; gap: 24px; align-self: stretch;">
+
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px; flex: 1 0 0;">
+            <p th:text="${name}" style="margin: 0; font-size: 18px; font-weight: bold; color: #333;">Hi, XXX</p>
+            <p style="margin: 0; font-size: 14px; color: gray;">비밀번호 재설정 지침은 다음과 같습니다</p>
+        </div>
+
+        <div style="display: flex; width: 49px; height: 49px; padding: 5.687px; justify-content: center; align-items: center; gap: 8.125px; border-radius: 48.75px; border-color: black;">
+            <img th:src="${profile}" style="width: 100%; height: 100%; border-radius: 100%;">
+        </div>
+    </div>
+
+    <div style="width: 100%; height: 1px; background: #DCDCDC; margin: 20px 0;"></div>
+
+    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 24px; align-self: stretch;">
+
+        <div style="margin: 0; font-size: 16px;">
+            VitalRoutes 비밀번호 재설정 요청이 접수되었습니다. 이 요청을 하지 않으셨다면 이 이메일은 무시하시면 됩니다. 이 요청을 했다면 비밀번호를 재설정하세요
+        </div>
+
+        <div class="link-layout" style="display: flex; flex-direction: column; align-items: center; gap: 10px; align-self: stretch;">
+            <a class="link-css" th:href="${url}" style="display: inline-flex; padding: 8px 16px; justify-content: center; align-items: center; border-radius: 30px; background: black; color: white; text-decoration-line: none;">암호를 재설정</a>
+        </div>
+
+        <div style="margin: 0; font-size: 14px; font-weight: bold;">고마워요,</div>
+        <div style="margin: 0; font-size: 14px;">팀 vitalRoutes</div>
+    </div>
+
+    <div style="color: gray; font-size: 12px; margin-top: 20px;">
+        위 버튼이 작동하지 않으면 <span style="font-weight: bold">URL</span>을 복사하여 브라우저에 붙여넣어 보세요. 문제가 계속 발생하는 경우 <span style="color: black">이메일을 회신</span>주세요
+    </div>
+
+    <div style="color: gray; font-size: 12px; margin-top: 10px; text-align: center;">
+        vitalroutesteam@gmail.com
+    </div>
 </div>
-<div>
-    <h3 th:text="${name}">Hi, </h3>
-    <p style="color: gray">비밀번호 재설정 지침은 다음과 같습니다</p>
-</div>
-<hr>
-<div>
-    <div>
-        VitalRoutes 비밀번호 재설정 요청이 접수되었습니다. 이 요청을 하지 않으셨다면 이 이메일은 무시하시면 됩니다.
-        이 요청을 했다면 비밀번호를 재설정하세요
-    </div>
-    <br/>
-    <div>
-        <a th:href="${url}">암호를 재설정</a>
-    </div>
-    <br/>
-    <div>
-        고마워요,
-    </div>
-    <div>
-        팀 vitalRoutes
-    </div>
-</div>
+
 </body>
 </html>

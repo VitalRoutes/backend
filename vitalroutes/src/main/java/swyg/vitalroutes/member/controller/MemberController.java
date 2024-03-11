@@ -299,7 +299,8 @@ public class MemberController {
             String url = sb.toString();
 
             String email = emailDTO.getEmail();
-            mailService.sendEmail(member.getName(), email, url);
+            String profile = member.getProfile();
+            mailService.sendEmail(member.getName(), email, profile, url);
         } catch (MemberModifyException exception) {
             return new ApiResponseDTO<>(exception.getStatus(), exception.getType(), exception.getMessage(), null);
         } catch (NoSuchElementException exception) {
