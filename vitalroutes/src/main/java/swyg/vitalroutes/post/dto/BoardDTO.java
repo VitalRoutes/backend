@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor // 모든 필드를 매개변수로 하는 생성자
 @Schema(description = "Challenge 생성, 조회, 수정, 삭제 시 사용")
 public class BoardDTO {
+    @Schema(description = "Challenge 작성자명을 담는 변수")
     private Long id;
-
     @Schema(description = "Challenge 작성자명을 담는 변수")
     private String boardWriter; // 작성자
     @Schema(description = "Challenge 제목을 담는 변수")

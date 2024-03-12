@@ -101,7 +101,7 @@ public class BoardController {
 
     @Operation(summary = "챌린지 목록 조회", description = "지금까지 등록된 챌린지 목록입니다.")
     @ApiResponse(responseCode = "200", description = "챌린지 조회 완료")
-    @GetMapping("/")
+    @GetMapping("/list")
     public ApiResponseDTO<?> findAll(Model model) {
         List<BoardDTO> boardDTOList = boardService.findAll(); // 게시글 "목록"을 가져온다.
         List<ChallengeCheckListDTO> challengeCheckListDTOList = new ArrayList<ChallengeCheckListDTO>();
@@ -163,6 +163,7 @@ public class BoardController {
         challengeCheckDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
         challengeCheckDTO.setStoredStartingPositionImageName(boardDTO.getStoredStartingPositionImageName());
         challengeCheckDTO.setStoredDestinationImageName(boardDTO.getStoredDestinationImageName());
+        challengeCheckDTO.setBoardHits(boardDTO.getBoardHits());
 
         int existingMode = boardService.findExistingModeById(boardDTO.getId());
         challengeCheckDTO.setExistingMode(existingMode);

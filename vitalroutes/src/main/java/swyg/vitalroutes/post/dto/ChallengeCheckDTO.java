@@ -20,6 +20,9 @@ public class ChallengeCheckDTO {
     @Schema(description = "Challenge 등록시 사용한 이동 수단을 담는 변수. ex. 걷기(0), 자전거(1) ")
     private String challengeTransportation; // 이동수단
 
+    @Schema(description = "챌린지 조회 수")
+    private int boardHits;  // 조회수 
+
     @Schema(description = "Challenge 경로 사진이 저장 플래그")
     private int existingMode; // 파일 첨부 여부(첨부 1, 미첨부 0)
 
