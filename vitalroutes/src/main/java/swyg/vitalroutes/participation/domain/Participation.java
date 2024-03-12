@@ -54,7 +54,7 @@ public class Participation {
 
 
     public void setParticipationInBoard(BoardEntity board) {
-        // board.getParticipationList().add(this);  // BoardEntity 에 List 구현 필요
+        board.getParticipationList().add(this);
         this.board = board;
     }
 

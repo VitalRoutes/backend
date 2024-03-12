@@ -22,6 +22,8 @@ public class ChallengeCheckDTO {
 
     @Schema(description = "챌린지 조회 수")
     private int boardHits;  // 조회수 
+    @Schema(description = "Challenge 참여자 수")
+    private int totalComments;  // 참가자 수, 댓글 수
 
     @Schema(description = "Challenge 경로 사진이 저장 플래그")
     private int existingMode; // 파일 첨부 여부(첨부 1, 미첨부 0)

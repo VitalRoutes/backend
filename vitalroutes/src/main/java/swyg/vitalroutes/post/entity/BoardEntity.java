@@ -3,7 +3,12 @@ package swyg.vitalroutes.post.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import swyg.vitalroutes.member.domain.Member;
+import swyg.vitalroutes.participation.domain.Participation;
 import swyg.vitalroutes.post.dto.BoardDTO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // DB의 테이블 역할을 하는 클래스
 @Entity // Entity로 사용하는 클래스임을 명시
@@ -37,6 +42,22 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
     // mappedBy : 어떤 것과 매칭을 시킬지 -> BoardFileEntity에 외래키인 boardEntity과 맞춰준다
     // boardFileEntity파일에서 매핑할 변수이름과 동일하게 작성
     private BoardFileEntity boardFileEntity;
+
+    /**
+     * 챌린지와 참여의 연관관계
+     * 챌린지와 연관관계가 있어야 참여자 관련한 조회가 가능합니다. ex> 참여자 수, 내가 참여한 챌린지
+     */
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Participation> participationList = new ArrayList<>();
+
+    /**
+     * 내가 작성한 챌린지 조회할 때 사용할 수 있습니다.
+     */
+    /*
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+    */
 
     public static BoardEntity toSaveEntity(BoardDTO boardDTO){
         // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값

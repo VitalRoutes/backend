@@ -163,7 +163,8 @@ public class BoardController {
         challengeCheckDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
         challengeCheckDTO.setStoredStartingPositionImageName(boardDTO.getStoredStartingPositionImageName());
         challengeCheckDTO.setStoredDestinationImageName(boardDTO.getStoredDestinationImageName());
-        challengeCheckDTO.setBoardHits(boardDTO.getBoardHits());
+        challengeCheckDTO.setBoardHits(boardDTO.getBoardHits());    // 조회 수
+        challengeCheckDTO.setTotalComments(boardDTO.getTotalComments());    // 참가자 수
 
         int existingMode = boardService.findExistingModeById(boardDTO.getId());
         challengeCheckDTO.setExistingMode(existingMode);

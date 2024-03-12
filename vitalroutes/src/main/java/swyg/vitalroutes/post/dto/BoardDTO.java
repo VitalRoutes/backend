@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 public class BoardDTO {
     @Schema(description = "Challenge 작성자명을 담는 변수")
     private Long id;
+    @Schema(description = "Challenge 참여자 수")
+    private int totalComments;
+
     @Schema(description = "Challenge 작성자명을 담는 변수")
     private String boardWriter; // 작성자
     @Schema(description = "Challenge 제목을 담는 변수")
@@ -117,6 +120,7 @@ public class BoardDTO {
         boardDTO.setBoardHits(boardEntity.getBoardHits());
         boardDTO.setBoardCreatedTime(boardEntity.getCreatedTime());
         boardDTO.setBoardUpdatedTime(boardEntity.getUpdatedTime());
+        boardDTO.setTotalComments(boardEntity.getParticipationList().size());   // 참여자 수
 
         //boardDTO.setFileAttached(boardEntity.getFileAttached());
         if(boardEntity.getFileAttached() == 0){ // 파일 없다면
