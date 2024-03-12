@@ -120,7 +120,7 @@ public class BoardController {
         챌린지 목록을 조회하기 위한 데이터 전송
          */
         ChallengeCheckListDTO challengeCheckListDTO = new ChallengeCheckListDTO();
-
+        challengeCheckListDTO.setBoardId(boardDTO.getId());
         challengeCheckListDTO.setChallengeTitle(boardDTO.getBoardTitle());
         challengeCheckListDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
         challengeCheckListDTO.setBoardParty(0); // 참여 인원은일단 0세팅

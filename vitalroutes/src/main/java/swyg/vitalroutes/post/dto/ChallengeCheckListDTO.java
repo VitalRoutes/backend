@@ -6,6 +6,9 @@ import lombok.Data;
 @Data
 @Schema(description = "Challenge 목록 조회 시 사용")
 public class ChallengeCheckListDTO {
+
+    private Long boardId;
+
     @Schema(description = "Challenge 제목을 담는 변수")
     private String challengeTitle; // 제목
 
