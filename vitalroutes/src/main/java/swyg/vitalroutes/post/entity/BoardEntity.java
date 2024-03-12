@@ -52,6 +52,7 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
 
     /**
      * 내가 작성한 챌린지 조회할 때 사용할 수 있습니다.
+     * 생성하실 때 Member 객체와 연관관계를 지정해주셔야 합니다.
      */
     /*
     @ManyToOne(fetch = FetchType.LAZY)

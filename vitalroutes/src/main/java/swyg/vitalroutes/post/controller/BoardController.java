@@ -123,7 +123,7 @@ public class BoardController {
         challengeCheckListDTO.setBoardId(boardDTO.getId());
         challengeCheckListDTO.setChallengeTitle(boardDTO.getBoardTitle());
         challengeCheckListDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
-        challengeCheckListDTO.setBoardParty(0); // 참여 인원은일단 0세팅
+        challengeCheckListDTO.setBoardParty(boardDTO.getTotalComments()); // 참여 인원은일단 0세팅
 
         return challengeCheckListDTO;
     }
