@@ -1,6 +1,9 @@
 package swyg.vitalroutes.post.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,6 +12,10 @@ import java.time.LocalDateTime;
 @Data
 @Schema(description = "Challenge 생성 시 사용")
 public class ChallengeSaveFormDTO {
+    @Id // pk 컬럼 지정. 필수
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // mysql 기준 auto_invrement 사용
+    private Long id;
+
     @Schema(description = "Challenge 작성자명을 담는 변수")
     private String challengeWriter; // 작성자
     @Schema(description = "Challenge 제목을 담는 변수")

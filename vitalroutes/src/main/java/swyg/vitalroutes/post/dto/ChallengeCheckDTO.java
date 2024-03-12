@@ -1,11 +1,16 @@
 package swyg.vitalroutes.post.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
 @Schema(description = "Challenge 조회 시 사용")
 public class ChallengeCheckDTO {
+    @Schema(description = "Challenge가 저장된 DB id key값")
+    private Long id;
     @Schema(description = "Challenge 작성자명을 담는 변수")
     private String challengeWriter; // 작성자
     @Schema(description = "Challenge 제목을 담는 변수")

@@ -58,6 +58,7 @@ public class BoardController {
 
     private ChallengeSaveFormDTO toTransformChallengeSaveFormDTO(BoardDTO boardDTO) {
         ChallengeSaveFormDTO challengeSaveFormDTO = new ChallengeSaveFormDTO();
+        challengeSaveFormDTO.setId(boardDTO.getId());
         challengeSaveFormDTO.setChallengeWriter(boardDTO.getBoardWriter());
         challengeSaveFormDTO.setChallengeTitle(boardDTO.getBoardTitle());
         challengeSaveFormDTO.setChallengeContents(boardDTO.getBoardContents());
@@ -149,12 +150,12 @@ public class BoardController {
         //model.addAttribute("page", pageable.getPageNumber());
         //return "detail";
         //return boardDTO;
-        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeCheckDTO);
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지가 조회되었습니다.", challengeCheckDTO);
     }
 
     private ChallengeCheckDTO getChallengeCheckDTO(BoardDTO boardDTO) {
         ChallengeCheckDTO challengeCheckDTO = new ChallengeCheckDTO();
-
+        challengeCheckDTO.setId(boardDTO.getId());
         challengeCheckDTO.setChallengeWriter(boardDTO.getBoardWriter());
         challengeCheckDTO.setChallengeTitle(boardDTO.getBoardTitle());
         challengeCheckDTO.setChallengeContents(boardDTO.getBoardContents());
@@ -190,35 +191,46 @@ public class BoardController {
         return challengeCheckDTO;
     }
 
+    @Operation(summary = "수정할 {id}에 해당하는 챌린지 불러오기", description = "수정할 {id}에 해당하는 챌린지입니다.")
+    @ApiResponse(responseCode = "200", description = "{id}에 해당하는 챌린지 불러오기 완료")
     @GetMapping("/update/{id}")
-    public String updateForm(@PathVariable("id") Long id, Model model) {
+    public ApiResponseDTO<?> updateForm(@PathVariable("id") Long id, Model model) {
         /*
             게시글의 정보를 Update.html에 보여줄 목적
          */
         BoardDTO boardDTO = boardService.findById(id);
-        model.addAttribute("boardUpdate", boardDTO);
-        return "update";
+        ChallengeCheckDTO challengeCheckDTO = getChallengeCheckDTO(boardDTO);
+
+        //model.addAttribute("boardUpdate", boardDTO);
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지를 불러왔습니다.", challengeCheckDTO);
     }
 
+    @Operation(summary = "챌린지 수정후 수정된 챌린지 확인", description = "수정된 챌린지입니다.")
+    @ApiResponse(responseCode = "200", description = "수정 완료")
     @PostMapping("/update")
-    public String update(@ModelAttribute BoardDTO boardDTO, Model model) {
+    public ApiResponseDTO<?> update(@ModelAttribute BoardDTO boardDTO, Model model) {
         /*
             수정 후 수정이 반영된 상세페이지를 보여줌
             (목록을 보여주어도 됨)
          */
         BoardDTO board = boardService.update(boardDTO);
-        model.addAttribute("board", board);
-        return "detail";
+        ChallengeSaveFormDTO challengeSaveFormDTO = toTransformChallengeSaveFormDTO(boardDTO);
+        //model.addAttribute("board", board);
+        //return "detail";
         //return "redirect:/board/" + boardDTO.getId(); // 수정 후 조회수 업데이트에 영향을 받을 수 있다.
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 수정 완료", challengeSaveFormDTO);
     }
 
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") Long id) {
+    @Operation(summary = "챌린지 삭제하기", description = "삭제할 챌린지입니다.")
+    @ApiResponse(responseCode = "200", description = "삭제 완료")
+    @DeleteMapping("/delete/{id}")
+    public ApiResponseDTO<?> delete(@PathVariable("id") Long id) {
         /*
             삭제 후 게시글 목록이 나타남
          */
         boardService.delete(id);
-        return "redirect:/board/";
+        //return "redirect:/board/";
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 삭제 완료", "삭제 완료");
     }
 
     // /board/paging?page=1
