@@ -50,7 +50,7 @@ public class KakaoLoginController {
     @ApiResponses(value = {
             @ApiResponse(description = "카카오 로그인 화면으로 리다이렉트")}
     )
-    @GetMapping("/oauth2/kakao")
+    @GetMapping("/login/kakaoLogin")
     public void kakaoRedirect(HttpServletResponse response) throws IOException {
         String uriString = UriComponentsBuilder
                 .fromUriString("https://kauth.kakao.com/oauth/authorize")
