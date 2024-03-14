@@ -1,10 +1,14 @@
 server:
   port: 8081
+  http2:
+    enabled: true
   ssl:
     key-store: classpath:ssl/keystore.p12
     key-store-type: PKCS12
     key-store-password: 1
     enabled: true
+    protocol: TLS
+    enabled-protocols: TLSv1.2
 
 spring:
   datasource:
