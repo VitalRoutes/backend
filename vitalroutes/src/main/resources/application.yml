@@ -68,6 +68,5 @@ jwt:
 kakao:
   login:
     client-id: ENC(DINFbAY/RI0maEuCPDXuQcCQNp4+CxtI7O+wFoDI1ohNpHMAWvKNo71lDMLPaAy3)
-    redirect-uri: ENC(Cwne+i2w5JVZ1nZ8+8m0VsTdcIsYwnAVm/oMKbeYO9OZg5+cGWb05WBUNUmL5V2VmpqlypTsYgg=)
-    #redirect-uri: http://localhost:8080/kakaologin
-    #redirect-uri: http://localhost:8080/oauth2/kakao
+    redirect-uri: ENC(hYEgWQWkmYnlDbU4bo601o2IMfWdNlVZYBXX0QxaSKKdxvzke1XkjH0Bztbflq7t)
+    # redirect-uri: ENC(R8+SIEhU7phfldyMtihTyeGkgnFyyX1jDVq3Fy4YNgBHqaU5zLG8mv2Jhz6X/HvZlekFGhJr0LMnyPzZinpMvw==) # 배포 환경
