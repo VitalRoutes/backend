@@ -11,8 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.multipart.MultipartFile;
 import swyg.vitalroutes.post.dto.BoardDTO;
+import swyg.vitalroutes.post.dto.ChallengeCheckListDTO;
 import swyg.vitalroutes.post.entity.BoardEntity;
 import swyg.vitalroutes.post.entity.BoardFileEntity;
 import swyg.vitalroutes.post.entity.BoardPathImageEntity;
@@ -27,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 // service에서 일어나는 작업
 // Controller -> (DTO -> Entity) -> Repository (entity class에서 이루어질 작업)
@@ -248,5 +251,32 @@ public class BoardService {
                     lat, lon, locationOnRoute);
             boardPathImageRepository.save(boardPathImageEntity);
         }
+    }
+
+    public List<ChallengeCheckListDTO> fetchPostPagesBy(Long lastBoardId, int size){
+        PageRequest pageRequest = PageRequest.of(0,size);
+        Page<BoardEntity> boardEntityPage =
+                boardRepository.findByPostIdLessThanOrderByPostIdDesc(lastBoardId, pageRequest);
+        List<BoardEntity> boardEntities = boardEntityPage.getContent();
+
+        for(BoardEntity be : boardEntities){
+            System.out.println("===========================");
+            System.out.println("post id : " + be.getId());
+            System.out.println("post title : " + be.getBoardTitle());
+            System.out.println("post writer : " + be.getBoardWriter());
+        }
+
+        return boardEntities.stream().map(BoardDTO::transformChallengeCheckListDTO).collect(Collectors.toList());
+    }
+
+    public ChallengeCheckListDTO getChallengeCheckListDTO(BoardDTO boardDTO) {
+        //챌린지 목록을 조회하기 위한 데이터 전송
+        ChallengeCheckListDTO challengeCheckListDTO = new ChallengeCheckListDTO();
+        challengeCheckListDTO.setBoardId(boardDTO.getId());
+        challengeCheckListDTO.setChallengeTitle(boardDTO.getBoardTitle());
+        challengeCheckListDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
+        challengeCheckListDTO.setBoardParty(boardDTO.getTotalComments()); // 참여 인원은일단 0세팅
+
+        return challengeCheckListDTO;
     }
 }

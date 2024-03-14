@@ -127,7 +127,7 @@ public class BoardDTO {
         this.boardHits = boardHits;
         this.boardCreatedTime = boardCreatedTime;
     }
-    
+
     public static BoardDTO toBoardDTO(BoardEntity boardEntity){
         // entity -> DTO
         BoardDTO boardDTO = new BoardDTO();
@@ -220,5 +220,17 @@ public class BoardDTO {
         }
 
         return boardDTO;
+    }
+
+    public static ChallengeCheckListDTO transformChallengeCheckListDTO(BoardEntity boardEntity) {
+        ChallengeCheckListDTO challengeCheckListDTO = new ChallengeCheckListDTO();
+        challengeCheckListDTO.setBoardId(boardEntity.getId());
+        challengeCheckListDTO.setChallengeTitle(boardEntity.getBoardTitle());
+        challengeCheckListDTO.setStoredTitleImageName(boardEntity.getBoardFileEntity().getStoredFileName());
+        //challengeCheckListDTO.setBoardParty(boardEntity.getParticipationList().size()); // 참여 인원은일단 0세팅
+        challengeCheckListDTO.setBoardParty(0); // 참여 인원은일단 0세팅
+        //challengeCheckListDTO.setBoardParty(boardDTO.getTotalComments()); // 참여 인원은일단 0세팅
+
+        return challengeCheckListDTO;
     }
 }

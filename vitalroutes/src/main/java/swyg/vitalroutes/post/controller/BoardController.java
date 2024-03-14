@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -109,17 +110,16 @@ public class BoardController {
 
         for(BoardDTO boardDTO : boardDTOList){
             ChallengeCheckListDTO challengeCheckListDTO = new ChallengeCheckListDTO();
-            challengeCheckListDTO = getChallengeCheckListDTO(boardDTO);
+            challengeCheckListDTO = boardService.getChallengeCheckListDTO(boardDTO);
             challengeCheckListDTOList.add(challengeCheckListDTO);
         }
 
         return new ApiResponseDTO<>(OK, SUCCESS, "챌린지 목록이 조회되었습니다.", challengeCheckListDTOList);
     }
 
+    /*
     private ChallengeCheckListDTO getChallengeCheckListDTO(BoardDTO boardDTO) {
-        /*
-        챌린지 목록을 조회하기 위한 데이터 전송
-         */
+        //챌린지 목록을 조회하기 위한 데이터 전송
         ChallengeCheckListDTO challengeCheckListDTO = new ChallengeCheckListDTO();
         challengeCheckListDTO.setBoardId(boardDTO.getId());
         challengeCheckListDTO.setChallengeTitle(boardDTO.getBoardTitle());
@@ -128,6 +128,7 @@ public class BoardController {
 
         return challengeCheckListDTO;
     }
+    */
 
     @Operation(summary = "{id}에 해당하는 챌린지 상세 조회", description = "{id}에 해당하는 챌린지입니다.")
     @ApiResponse(responseCode = "200", description = "{id}에 해당하는 챌린지 상세 조회 완료")
@@ -281,5 +282,14 @@ public class BoardController {
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
         return "paging";
+    }
+
+    @Operation(summary = "챌린지 목록 불러오기", description = "챌린지 목록 불러오기")
+    @ApiResponse(responseCode = "200", description = "불러오기 완료")
+    @GetMapping("/scroll")
+    public List<ChallengeCheckListDTO> getBoardList(@RequestParam Long lastBoardId) {
+                                                    //@RequestParam int size){
+        int size = 12; // 12개씩 불러옴
+        return boardService.fetchPostPagesBy(lastBoardId, size);
     }
 }
