@@ -1,3 +1,10 @@
+server:
+  port: 443
+  ssl:
+    key-store: classpath:ssl/keystore.p12
+    key-store-type: PKCS12
+    key-store-password: 1
+
 spring:
   datasource:
     url: ENC(jO49RGHnkCNy+rqEKuRQ4du128xO/FGprtYMt5NCX0iNdSjOFsbOCY/h/hSWLBPbKUa0zp2gAIFhYBsNShkXCgJw05bgcInPTm47U3/FqH7yBwWuOSVXNzhhmM6CxYTzhMKyPlGjOKo8VDafXIP1qwjM/DtXjLpi)
