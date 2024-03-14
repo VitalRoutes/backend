@@ -33,6 +33,7 @@ import static swyg.vitalroutes.common.response.ResponseType.SUCCESS;
 @RestController
 @RequiredArgsConstructor // 생성자 주입방식으로 의존성 주입받음 => service클래스 호출
 @RequestMapping("/board") // 부모 주소 자동 입력
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class BoardController {
     private final BoardService boardService; // 생성자 주입방식으로 의존성 주입받음
 
