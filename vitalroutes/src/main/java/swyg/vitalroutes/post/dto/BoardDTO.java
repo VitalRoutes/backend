@@ -161,7 +161,7 @@ public class BoardDTO {
             boardDTO.setStartingPosLat(boardEntity.getBoardFileEntity()
                     .getBoardPathImageEntityList().get(0).getLatitude());
             boardDTO.setStartingPosLon(boardEntity.getBoardFileEntity()
-                    .getBoardPathImageEntityList().get(0).getLatitude());
+                    .getBoardPathImageEntityList().get(0).getLongitude());
 
             // 도착지 사진
             boardDTO.setOriginalDestinationImageName(boardEntity.getBoardFileEntity()
@@ -171,7 +171,7 @@ public class BoardDTO {
             boardDTO.setDestinationLat(boardEntity.getBoardFileEntity()
                     .getBoardPathImageEntityList().get(1).getLatitude());
             boardDTO.setDestinationLon(boardEntity.getBoardFileEntity()
-                    .getBoardPathImageEntityList().get(1).getLatitude());
+                    .getBoardPathImageEntityList().get(1).getLongitude());
 
             int mode = boardEntity.getBoardFileEntity().getExistingPathImage();
             if((mode & 0B01000) == 0B01000){ // 경유지 1
@@ -186,7 +186,7 @@ public class BoardDTO {
                 boardDTO.setStopOver1Lat(boardEntity.getBoardFileEntity()
                         .getBoardPathImageEntityList().get(idx).getLatitude());
                 boardDTO.setStopOver1Lon(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(idx).getLatitude());
+                        .getBoardPathImageEntityList().get(idx).getLongitude());
             }
             if((mode & 0B00100) == 0B00100){  // 경유지 2
                 int idx = 0;
@@ -200,7 +200,7 @@ public class BoardDTO {
                 boardDTO.setStopOver2Lat(boardEntity.getBoardFileEntity()
                         .getBoardPathImageEntityList().get(idx).getLatitude());
                 boardDTO.setStopOver2Lon(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(idx).getLatitude());
+                        .getBoardPathImageEntityList().get(idx).getLongitude());
             }
             if((mode & 0B00010) == 0B00010){  // 경유지 3
                 int idx = 0;
@@ -214,7 +214,7 @@ public class BoardDTO {
                 boardDTO.setStopOver3Lat(boardEntity.getBoardFileEntity()
                         .getBoardPathImageEntityList().get(idx).getLatitude());
                 boardDTO.setStopOver3Lon(boardEntity.getBoardFileEntity()
-                        .getBoardPathImageEntityList().get(idx).getLatitude());
+                        .getBoardPathImageEntityList().get(idx).getLongitude());
             }
             //boardDTO.setPathFileAttached(mode);
         }
