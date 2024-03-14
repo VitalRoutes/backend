@@ -58,6 +58,10 @@ public class BoardDTO {
     private String storedStartingPositionImageName; // 출발지 이미지 서버저장용 파일 이름
     //@Schema(description = "Challenge 출발 사진 존재 여부 확인. 있으면(1) 없으면(0). 항상(1)임")
     private int startingPositionImageAttached; // 파일 첨부 여부(첨부 1, 미첨부 0)
+    @Schema(description = "출발지 위도")
+    private double startingPosLat; // 출발지 위도
+    @Schema(description = "출발지 경도")
+    private double startingPosLon; // 출발지 경도
 
     @Schema(description = "Challenge 이동 경로 사진 중 도착지 사진 파일을 담는 변수")
     private MultipartFile destinationImage; // 도착지 이미지 파일 담는용도
@@ -67,6 +71,10 @@ public class BoardDTO {
     private String storedDestinationImageName; // 도착지 이미지 서버저장용 파일 이름
     //@Schema(description = "Challenge 도착 사진 존재 여부 확인. 있으면(1) 없으면(0). 항상(1)임")
     private int destinationImageAttached; // 파일 첨부 여부(첨부 1, 미첨부 0)
+    @Schema(description = "도착지 위도")
+    private double destinationLat;
+    @Schema(description = "도착지 경도")
+    private double destinationLon;
 
     @Schema(description = "Challenge 이동 경로 사진 중 경유지1 사진 파일을 담는 변수")
     private MultipartFile stopOverImage1; // 경유지1 이미지 파일 담는용도
@@ -76,6 +84,10 @@ public class BoardDTO {
     private String storedStopOverImage1Name; // 경유지1 이미지 서버저장용 파일 이름
     //@Schema(description = "Challenge 경유지1 사진 존재 여부 확인. 있으면(1) 없으면(0). 항상(1)임")
     private int stopOverImage1Attached; // 파일 첨부 여부(첨부 1, 미첨부 0)
+    @Schema(description = "경유지1 위도")
+    private double stopOver1Lat;
+    @Schema(description = "경유지1 경도")
+    private double stopOver1Lon;
 
     @Schema(description = "Challenge 이동 경로 사진 중 경유지2 사진 파일을 담는 변수")
     private MultipartFile stopOverImage2; // 경유지2 이미지 파일 담는용도
@@ -85,6 +97,10 @@ public class BoardDTO {
     private String storedStopOverImage2Name; // 경유지2 이미지 서버저장용 파일 이름
     //@Schema(description = "Challenge 경유지2 사진 존재 여부 확인. 있으면(1) 없으면(0). 항상(1)임")
     private int stopOverImage2Attached; // 파일 첨부 여부(첨부 1, 미첨부 0)
+    @Schema(description = "경유지2 위도")
+    private double stopOver2Lat;
+    @Schema(description = "경유지2 경도")
+    private double stopOver2Lon;
 
     @Schema(description = "Challenge 이동 경로 사진 중 경유지3 사진 파일을 담는 변수")
     private MultipartFile stopOverImage3; // 경유지3 이미지 파일 담는용도
@@ -94,6 +110,10 @@ public class BoardDTO {
     private String storedStopOverImage3Name; // 경유지3 이미지 서버저장용 파일 이름
     //@Schema(description = "Challenge 경유지3 사진 존재 여부 확인. 있으면(1) 없으면(0). 항상(1)임")
     private int stopOverImage3Attached; // 파일 첨부 여부(첨부 1, 미첨부 0)
+    @Schema(description = "경유지3 위도")
+    private double stopOver3Lat;
+    @Schema(description = "경유지3 경도")
+    private double stopOver3Lon;
 
     // 생성자 생성
     public BoardDTO(Long id,
@@ -138,12 +158,20 @@ public class BoardDTO {
                     .getBoardPathImageEntityList().get(0).getOriginalFileName());
             boardDTO.setStoredStartingPositionImageName(boardEntity.getBoardFileEntity()
                     .getBoardPathImageEntityList().get(0).getStoredFileName());
+            boardDTO.setStartingPosLat(boardEntity.getBoardFileEntity()
+                    .getBoardPathImageEntityList().get(0).getLatitude());
+            boardDTO.setStartingPosLon(boardEntity.getBoardFileEntity()
+                    .getBoardPathImageEntityList().get(0).getLatitude());
 
             // 도착지 사진
             boardDTO.setOriginalDestinationImageName(boardEntity.getBoardFileEntity()
                     .getBoardPathImageEntityList().get(1).getOriginalFileName());
             boardDTO.setStoredDestinationImageName(boardEntity.getBoardFileEntity()
                     .getBoardPathImageEntityList().get(1).getStoredFileName());
+            boardDTO.setDestinationLat(boardEntity.getBoardFileEntity()
+                    .getBoardPathImageEntityList().get(1).getLatitude());
+            boardDTO.setDestinationLon(boardEntity.getBoardFileEntity()
+                    .getBoardPathImageEntityList().get(1).getLatitude());
 
             int mode = boardEntity.getBoardFileEntity().getExistingPathImage();
             if((mode & 0B01000) == 0B01000){ // 경유지 1
@@ -155,6 +183,10 @@ public class BoardDTO {
                         .getBoardPathImageEntityList().get(idx).getOriginalFileName());
                 boardDTO.setStoredStopOverImage1Name(boardEntity.getBoardFileEntity()
                         .getBoardPathImageEntityList().get(idx).getStoredFileName());
+                boardDTO.setStopOver1Lat(boardEntity.getBoardFileEntity()
+                        .getBoardPathImageEntityList().get(idx).getLatitude());
+                boardDTO.setStopOver1Lon(boardEntity.getBoardFileEntity()
+                        .getBoardPathImageEntityList().get(idx).getLatitude());
             }
             if((mode & 0B00100) == 0B00100){  // 경유지 2
                 int idx = 0;
@@ -165,6 +197,10 @@ public class BoardDTO {
                         .getBoardPathImageEntityList().get(idx).getOriginalFileName());
                 boardDTO.setStoredStopOverImage2Name(boardEntity.getBoardFileEntity()
                         .getBoardPathImageEntityList().get(idx).getStoredFileName());
+                boardDTO.setStopOver2Lat(boardEntity.getBoardFileEntity()
+                        .getBoardPathImageEntityList().get(idx).getLatitude());
+                boardDTO.setStopOver2Lon(boardEntity.getBoardFileEntity()
+                        .getBoardPathImageEntityList().get(idx).getLatitude());
             }
             if((mode & 0B00010) == 0B00010){  // 경유지 3
                 int idx = 0;
@@ -175,6 +211,10 @@ public class BoardDTO {
                         .getBoardPathImageEntityList().get(idx).getOriginalFileName());
                 boardDTO.setStoredStopOverImage3Name(boardEntity.getBoardFileEntity()
                         .getBoardPathImageEntityList().get(idx).getStoredFileName());
+                boardDTO.setStopOver3Lat(boardEntity.getBoardFileEntity()
+                        .getBoardPathImageEntityList().get(idx).getLatitude());
+                boardDTO.setStopOver3Lon(boardEntity.getBoardFileEntity()
+                        .getBoardPathImageEntityList().get(idx).getLatitude());
             }
             //boardDTO.setPathFileAttached(mode);
         }

@@ -162,7 +162,13 @@ public class BoardController {
         challengeCheckDTO.setChallengeTransportation(boardDTO.getBoardTransportation());
         challengeCheckDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
         challengeCheckDTO.setStoredStartingPositionImageName(boardDTO.getStoredStartingPositionImageName());
+        challengeCheckDTO.setStartingPosLat(boardDTO.getStartingPosLat());
+        challengeCheckDTO.setStartingPosLon(boardDTO.getStartingPosLon());
+
         challengeCheckDTO.setStoredDestinationImageName(boardDTO.getStoredDestinationImageName());
+        challengeCheckDTO.setDestinationLat(boardDTO.getDestinationLat());
+        challengeCheckDTO.setDestinationLon(boardDTO.getDestinationLon());
+
         challengeCheckDTO.setBoardHits(boardDTO.getBoardHits());    // 조회 수
         challengeCheckDTO.setTotalComments(boardDTO.getTotalComments());    // 참가자 수
 
@@ -171,23 +177,35 @@ public class BoardController {
 
         if((existingMode & 0B01000) == 0B01000){
             challengeCheckDTO.setStoredStopOverImage1Name(boardDTO.getStoredStopOverImage1Name());
+            challengeCheckDTO.setStopOver1Lat(boardDTO.getStopOver1Lat());
+            challengeCheckDTO.setStopOver1Lon(boardDTO.getStopOver1Lon());
         }
         else {
             challengeCheckDTO.setStoredStopOverImage1Name(null);
+            challengeCheckDTO.setStopOver1Lat(-1);
+            challengeCheckDTO.setStopOver1Lon(-1);
         }
 
         if((existingMode & 0B00100) == 0B00100){
             challengeCheckDTO.setStoredStopOverImage2Name(boardDTO.getStoredStopOverImage2Name());
+            challengeCheckDTO.setStopOver2Lat(boardDTO.getStopOver2Lat());
+            challengeCheckDTO.setStopOver2Lon(boardDTO.getStopOver2Lon());
         }
         else {
             challengeCheckDTO.setStoredStopOverImage2Name(null);
+            challengeCheckDTO.setStopOver1Lat(-1);
+            challengeCheckDTO.setStopOver1Lon(-1);
         }
 
         if((existingMode & 0B00010) == 0B00010){
             challengeCheckDTO.setStoredStopOverImage3Name(boardDTO.getStoredStopOverImage3Name());
+            challengeCheckDTO.setStopOver3Lat(boardDTO.getStopOver3Lat());
+            challengeCheckDTO.setStopOver3Lon(boardDTO.getStopOver3Lon());
         }
         else {
             challengeCheckDTO.setStoredStopOverImage3Name(null);
+            challengeCheckDTO.setStopOver1Lat(-1);
+            challengeCheckDTO.setStopOver1Lon(-1);
         }
 
         return challengeCheckDTO;

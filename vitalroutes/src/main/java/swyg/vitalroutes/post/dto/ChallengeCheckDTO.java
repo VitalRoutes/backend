@@ -33,12 +33,32 @@ public class ChallengeCheckDTO {
 
     @Schema(description = "Challenge 저장할 출발지 사진 파일명을 담는 변수")
     private String storedStartingPositionImageName; // 출발지 이미지 서버저장용 파일 이름
+    @Schema(description = "출발지 위도")
+    private double startingPosLat; // 출발지 위도
+    @Schema(description = "출발지 경도")
+    private double startingPosLon; // 출발지 경도
     @Schema(description = "Challenge 저장할 도착지 사진 파일명을 담는 변수")
     private String storedDestinationImageName; // 도착지 이미지 서버저장용 파일 이름
+    @Schema(description = "도착지 위도")
+    private double destinationLat;
+    @Schema(description = "도착지 경도")
+    private double destinationLon;
     @Schema(description = "Challenge 저장할 경유지1 사진 파일명을 담는 변수")
     private String storedStopOverImage1Name; // 경유지1 이미지 서버저장용 파일 이름
+    @Schema(description = "경유지1 위도")
+    private double stopOver1Lat;
+    @Schema(description = "경유지1 경도")
+    private double stopOver1Lon;
     @Schema(description = "Challenge 저장할 경유지2 사진 파일명을 담는 변수")
     private String storedStopOverImage2Name; // 경유지2 이미지 서버저장용 파일 이름
+    @Schema(description = "경유지2 위도")
+    private double stopOver2Lat;
+    @Schema(description = "경유지2 경도")
+    private double stopOver2Lon;
     @Schema(description = "Challenge 저장할 경유지3 사진 파일명을 담는 변수")
     private String storedStopOverImage3Name; // 경유지3 이미지 서버저장용 파일 이름
+    @Schema(description = "경유지3 위도")
+    private double stopOver3Lat;
+    @Schema(description = "경유지3 경도")
+    private double stopOver3Lon;
 }
