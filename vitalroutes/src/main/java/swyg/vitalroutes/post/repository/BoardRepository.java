@@ -1,10 +1,17 @@
 package swyg.vitalroutes.post.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import swyg.vitalroutes.post.dto.BoardDTO;
+import swyg.vitalroutes.post.dto.ChallengeCheckListDTO;
 import swyg.vitalroutes.post.entity.BoardEntity;
+
+import java.util.List;
 
 public interface BoardRepository extends JpaRepository<BoardEntity, Long> { // Jpa레포를 상속받고, 상속받을때 BoardEntity클래스 이름과 BoardEntity클래스가 가진 pk타입을 상속받음
     /*
@@ -18,4 +25,8 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> { // J
         //@Query(value = "update {Entity이름 || table 이름} {약(식언)어} set {약(식언)어}.{Entity에 정의한 컬럼(DB컬럼 x)}=b.boardHits+1 where b.{boardEntity에 있는 id}=:{계속 바뀌는 부분, 아래 @Param의 id와 매칭}") // entity기준으로 Query 작성
         // @Query(~~~, nativeQuery = true) => nativeQuery = true 옵션을 사용하면 실제 DB 쿼리문을 사용할 수 있다.
     void updateHits(@Param("id") Long id);
+
+    //@Query(value = "SELECT p FROM BoardEntity p WHERE p.id < ?1 ORDER BY p.id")
+    @Query(value = "SELECT p FROM BoardEntity p WHERE p.id < ?1 ORDER BY p.id DESC")
+    Page<BoardEntity> findByPostIdLessThanOrderByPostIdDesc(Long lastBoardId, PageRequest pageRequest);
 }
