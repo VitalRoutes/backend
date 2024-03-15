@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Schema(description = "Challenge 조회 시 사용")
 public class ChallengeCheckDTO {
@@ -24,6 +26,9 @@ public class ChallengeCheckDTO {
     private int boardHits;  // 조회수 
     @Schema(description = "Challenge 참여자 수")
     private int totalComments;  // 참가자 수, 댓글 수
+
+    @Schema(description = "Challenge 태그 문자열 담는 변수")
+    private List<String> tags;
 
     @Schema(description = "Challenge 경로 사진이 저장 플래그")
     private int existingMode; // 파일 첨부 여부(첨부 1, 미첨부 0)
