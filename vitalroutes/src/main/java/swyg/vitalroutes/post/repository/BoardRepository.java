@@ -29,4 +29,7 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> { // J
     //@Query(value = "SELECT p FROM BoardEntity p WHERE p.id < ?1 ORDER BY p.id")
     @Query(value = "SELECT p FROM BoardEntity p WHERE p.id < ?1 ORDER BY p.id DESC")
     Page<BoardEntity> findByPostIdLessThanOrderByPostIdDesc(Long lastBoardId, PageRequest pageRequest);
+
+    //@Query(value = "SELECT MAX(e.id) FROM boardEntity e")
+    //Long getMaxId();
 }

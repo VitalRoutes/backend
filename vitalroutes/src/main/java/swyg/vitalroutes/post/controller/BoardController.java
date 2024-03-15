@@ -18,6 +18,7 @@ import swyg.vitalroutes.post.dto.BoardDTO;
 import swyg.vitalroutes.post.dto.ChallengeCheckDTO;
 import swyg.vitalroutes.post.dto.ChallengeCheckListDTO;
 import swyg.vitalroutes.post.dto.ChallengeSaveFormDTO;
+import swyg.vitalroutes.post.entity.TagEntity;
 import swyg.vitalroutes.post.service.BoardService;
 import swyg.vitalroutes.s3.S3UploadService;
 
@@ -65,6 +66,7 @@ public class BoardController {
         challengeSaveFormDTO.setChallengeTitle(boardDTO.getBoardTitle());
         challengeSaveFormDTO.setChallengeContents(boardDTO.getBoardContents());
         challengeSaveFormDTO.setChallengeTransportation(boardDTO.getBoardTransportation());
+        challengeSaveFormDTO.setTags(boardDTO.getTags());
         challengeSaveFormDTO.setTitleImage(boardDTO.getTitleImage());
         challengeSaveFormDTO.setStartingPositionImage(boardDTO.getStartingPositionImage());
         challengeSaveFormDTO.setDestinationImage(boardDTO.getDestinationImage());
@@ -86,6 +88,7 @@ public class BoardController {
         boardDTO.setBoardTitle(challengeSaveFormDTO.getChallengeTitle());
         boardDTO.setBoardContents(challengeSaveFormDTO.getChallengeContents());
         boardDTO.setBoardTransportation(challengeSaveFormDTO.getChallengeTransportation());
+        boardDTO.setTags(challengeSaveFormDTO.getTags());
         boardDTO.setTitleImage(challengeSaveFormDTO.getTitleImage());
         boardDTO.setStartingPositionImage(challengeSaveFormDTO.getStartingPositionImage());
         boardDTO.setTags(challengeSaveFormDTO.getTags());
@@ -163,6 +166,10 @@ public class BoardController {
         challengeCheckDTO.setChallengeTitle(boardDTO.getBoardTitle());
         challengeCheckDTO.setChallengeContents(boardDTO.getBoardContents());
         challengeCheckDTO.setChallengeTransportation(boardDTO.getBoardTransportation());
+
+        List<String> tags = boardService.findTagId(boardDTO.getId());
+        challengeCheckDTO.setTags(tags);
+
         challengeCheckDTO.setStoredTitleImageName(boardDTO.getStoredTitleImageName());
         challengeCheckDTO.setStoredStartingPositionImageName(boardDTO.getStoredStartingPositionImageName());
         challengeCheckDTO.setStartingPosLat(boardDTO.getStartingPosLat());

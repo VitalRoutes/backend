@@ -75,8 +75,30 @@ public class BoardService {
             List<String> tags = boardDTO.getTags();
             for(String tag : tags){
                 TagEntity tagEntity = new TagEntity();
-                tagEntity.setName(tag);
-                tagRepository.save(tagEntity);
+
+                List<TagEntity> tagEntities = tagRepository.findAll();
+                boolean isTag = false; // 이미 있는 태그인지 확인
+                Long curTagId = 0L;
+                for(TagEntity curTag : tagEntities){
+                    System.out.println("tag : " + tag);
+                    System.out.println("cur tag : " + curTag);
+                    if (tag.equals(curTag.getName())){
+                        System.out.println("true");
+                        isTag = true;
+                        curTagId = curTag.getId();
+                        break;
+                    }
+                }
+
+                if (isTag){
+                    tagEntity.setId(curTagId);
+                    tagEntity.setName(tag);
+                }
+                else {
+                    tagEntity.setName(tag);
+                    tagRepository.save(tagEntity);
+                }
+
                 BoardTagMapping boardTagMapping = new BoardTagMapping();
                 boardTagMapping = BoardTagMapping.savedBoardTagMap(boardEntity, tagEntity);
                 postTagMappingRepository.save(boardTagMapping);
@@ -160,6 +182,23 @@ public class BoardService {
             return existingMode;
         } else { // 객체에 값이 없다면 null
             return 0;
+        }
+    }
+
+    @Transactional
+    public List<String> findTagId(Long id) {
+        Optional<BoardEntity> optionalBoardEntity = boardRepository.findById(id);
+        if (optionalBoardEntity.isPresent()) { // .isPresent() 객체가 값을 가지고 있으면 True, 없으면 false
+            List<String> tags = new ArrayList<>();
+
+            BoardEntity boardEntity = optionalBoardEntity.get();
+            for(BoardTagMapping boardTagMapping : boardEntity.getBoardTagMappingList()){
+                tags.add(boardTagMapping.getTagEntity().getName());
+            }
+
+            return tags;
+        } else { // 객체에 값이 없다면 null
+            return null;
         }
     }
 
@@ -265,18 +304,32 @@ public class BoardService {
 
     public List<ChallengeCheckListDTO> fetchPostPagesBy(Long lastBoardId, int size){
         PageRequest pageRequest = PageRequest.of(0,size);
-        Page<BoardEntity> boardEntityPage =
-                boardRepository.findByPostIdLessThanOrderByPostIdDesc(lastBoardId, pageRequest);
-        List<BoardEntity> boardEntities = boardEntityPage.getContent();
 
-        for(BoardEntity be : boardEntities){
-            System.out.println("===========================");
-            System.out.println("post id : " + be.getId());
-            System.out.println("post title : " + be.getBoardTitle());
-            System.out.println("post writer : " + be.getBoardWriter());
+        if(lastBoardId == 0){
+            //Long boardMaxId = boardRepository.getMaxId();
+            Long boardMaxId = 2134567890L;
+            System.out.println("max _ id : " + boardMaxId);
+            Page<BoardEntity> boardEntityPage =
+                    boardRepository.findByPostIdLessThanOrderByPostIdDesc(boardMaxId, pageRequest);
+            List<BoardEntity> boardEntities = boardEntityPage.getContent();
+
+            return boardEntities.stream().map(BoardDTO::transformChallengeCheckListDTO).collect(Collectors.toList());
         }
+        else {
+            Page<BoardEntity> boardEntityPage =
+                    boardRepository.findByPostIdLessThanOrderByPostIdDesc(lastBoardId, pageRequest);
+            List<BoardEntity> boardEntities = boardEntityPage.getContent();
 
-        return boardEntities.stream().map(BoardDTO::transformChallengeCheckListDTO).collect(Collectors.toList());
+            /*
+            for(BoardEntity be : boardEntities){
+                System.out.println("===========================");
+                System.out.println("post id : " + be.getId());
+                System.out.println("post title : " + be.getBoardTitle());
+                System.out.println("post writer : " + be.getBoardWriter());
+            }
+            */
+            return boardEntities.stream().map(BoardDTO::transformChallengeCheckListDTO).collect(Collectors.toList());
+        }
     }
 
     public ChallengeCheckListDTO getChallengeCheckListDTO(BoardDTO boardDTO) {
