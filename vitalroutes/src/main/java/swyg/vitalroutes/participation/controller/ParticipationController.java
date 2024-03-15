@@ -77,7 +77,41 @@ public class ParticipationController {
         return new ApiResponseDTO<>(OK, SUCCESS, null, dataWithCount);
     }
 
-    
+    @Operation(description = "내가 참여한 챌린지 조회", summary = "내가 참여한 챌린지")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "OK SUCCESS",
+                    description = "조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(name = "Postman 에서 확인한 응답 예시", value = "{\n" +
+                                    "    \"status\": \"OK\",\n" +
+                                    "    \"type\": \"SUCCESS\",\n" +
+                                    "    \"message\": null,\n" +
+                                    "    \"data\": {\n" +
+                                    "        \"totalCount\": 15,\n" +
+                                    "        \"remainFlag\": true,\n" +
+                                    "        \"data\": [\n" +
+                                    "            {\n" +
+                                    "                \"participationId\": 5,\n" +
+                                    "                \"memberProfile\": \"testProfileImg\",\n" +
+                                    "                \"nickname\": \"테스트유저1\",\n" +
+                                    "                \"content\": \"챌린지 내용이다\",\n" +
+                                    "                \"timeString\": \"14시간 전\",\n" +
+                                    "                \"totalImages\": 0,\n" +
+                                    "                \"participationImages\": [],\n" +
+                                    "                \"totalComments\": 0\n" +
+                                    "            }\n" +
+                                    "        ]\n" +
+                                    "    }\n" +
+                                    "}")))
+    })
+    @GetMapping("/my-participation")
+    public ApiResponseDTO<?> viewMyParticipation(@PageableDefault(size = 12) Pageable pageable) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        DataWithCount<?> dataWithCount = participationService.findMyParticipation(member.getMemberId(), pageable);
+        return new ApiResponseDTO<>(OK, SUCCESS, null, dataWithCount);
+    }
+
+
     @Operation(description = "챌린지 참여 등록하기, form-data 형식으로 전달 필요, files 는 string 이 아닌 파일 형태, ParticipationSaveDTO 참고하면 좋음", summary = "챌린지 참여 게시글 등록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "OK SUCCESS",

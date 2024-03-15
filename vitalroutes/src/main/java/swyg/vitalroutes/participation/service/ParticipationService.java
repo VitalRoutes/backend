@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import swyg.vitalroutes.comments.repository.CommentRepository;
 import swyg.vitalroutes.common.exception.ParticipationException;
 import swyg.vitalroutes.common.response.DataWithCount;
+import swyg.vitalroutes.common.response.MyChallengeDTO;
 import swyg.vitalroutes.common.utils.FileUtils;
 import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.member.repository.MemberRepository;
@@ -55,6 +56,13 @@ public class ParticipationService {
         boolean remainFlag = pagingData.hasNext();  // 현재까지 보여지고 있는 데이터 외에 남은 데이터가 있는지
 
         return new DataWithCount<>(count, remainFlag, dtoList);
+    }
+
+    public DataWithCount<?> findMyParticipation(Long memberId, Pageable pageable) {
+        Page<MyChallengeDTO> myParticipation = participationRepository.findMyParticipation(memberId, pageable);
+        long count = myParticipation.getTotalElements();
+        boolean remainFlag = myParticipation.hasNext();
+        return new DataWithCount<>(count, remainFlag, myParticipation.getContent());
     }
 
 
