@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import swyg.vitalroutes.post.entity.BoardEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 // DTO ( Data Transfer Object), VL, Bean, ... 비슷한 용도
 // Entity는 살짝 결이 다름 ( 여러 파라미터를 한 객체에 담아서 보내는 용도 )
@@ -35,6 +36,9 @@ public class BoardDTO {
     private LocalDateTime boardCreatedTime;
     //@Schema(description = "Challenge 수정 시간을 담는 변수")
     private LocalDateTime boardUpdatedTime;
+
+    @Schema(description = "Challenge 태그 문자열 담는 변수")
+    private List<String> tags;
 
     @Schema(description = "Challenge 대표사진 파일을 담는 변수")
     // DTO에서 받는 부분은 MultipartFile만 동작

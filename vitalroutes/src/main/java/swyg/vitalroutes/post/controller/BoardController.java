@@ -88,6 +88,7 @@ public class BoardController {
         boardDTO.setBoardTransportation(challengeSaveFormDTO.getChallengeTransportation());
         boardDTO.setTitleImage(challengeSaveFormDTO.getTitleImage());
         boardDTO.setStartingPositionImage(challengeSaveFormDTO.getStartingPositionImage());
+        boardDTO.setTags(challengeSaveFormDTO.getTags());
         boardDTO.setDestinationImage(challengeSaveFormDTO.getDestinationImage());
         if(challengeSaveFormDTO.getStopOverImage1() != null) {
             boardDTO.setStopOverImage1(challengeSaveFormDTO.getStopOverImage1());

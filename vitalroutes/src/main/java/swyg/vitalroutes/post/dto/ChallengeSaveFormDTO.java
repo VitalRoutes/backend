@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Schema(description = "Challenge 생성 시 사용")
@@ -24,6 +25,9 @@ public class ChallengeSaveFormDTO {
     private String challengeContents; // 본문
     @Schema(description = "Challenge 등록시 사용한 이동 수단을 담는 변수. ex. 걷기(0), 자전거(1) ")
     private String challengeTransportation; // 이동수단
+
+    @Schema(description = "Challenge 태그 문자열 담는 변수")
+    private List<String> tags;
 
     @Schema(description = "Challenge 대표사진 파일을 담는 변수")
     private MultipartFile titleImage; // 실제 파일을 담아줄 수 있는 역할 (대표사진 저장)
