@@ -72,6 +72,10 @@ public class ParticipationService {
                 .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "사용자가 존재하지 않습니다"));
         BoardEntity board = boardRepository.findById(saveDTO.getBoardId())
                 .orElseThrow(() -> new ParticipationException(NOT_FOUND, FAIL, "게시글이 존재하지 않습니다"));
+        Optional<Participation> optionalParticipation = participationRepository.findByMemberIdAndBoardId(memberId, saveDTO.getBoardId());
+        if (optionalParticipation.isPresent()) {
+            throw new ParticipationException(BAD_REQUEST, FAIL, "이미 참여한 챌린지입니다");
+        }
 
         List<BoardPathImageEntity> boardPathImageEntityList = board.getBoardFileEntity().getBoardPathImageEntityList();
         // 도착지를 먼저 저장하시니...내가 정렬을 해야지...;;

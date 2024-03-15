@@ -87,22 +87,17 @@ public class ParticipationController {
                                     "    \"type\": \"SUCCESS\",\n" +
                                     "    \"message\": null,\n" +
                                     "    \"data\": {\n" +
-                                    "        \"totalCount\": 15,\n" +
-                                    "        \"remainFlag\": true,\n" +
-                                    "        \"data\": [\n" +
+                                    "        \"totalCount\": 9,\n" +
+                                    "        \"remainFlag\": false,\n" +
+                                    "        \"comments\": [\n" +
                                     "            {\n" +
-                                    "                \"participationId\": 5,\n" +
-                                    "                \"memberProfile\": \"testProfileImg\",\n" +
-                                    "                \"nickname\": \"테스트유저1\",\n" +
-                                    "                \"content\": \"챌린지 내용이다\",\n" +
-                                    "                \"timeString\": \"14시간 전\",\n" +
-                                    "                \"totalImages\": 0,\n" +
-                                    "                \"participationImages\": [],\n" +
-                                    "                \"totalComments\": 0\n" +
-                                    "            }\n" +
-                                    "        ]\n" +
-                                    "    }\n" +
-                                    "}")))
+                                    "                \"boardId\": 14,\n" +
+                                    "                \"title\": \"테스으으으으트\"\n" +
+                                    "            },\n" +
+                                    "            {\n" +
+                                    "                \"boardId\": 14,\n" +
+                                    "                \"title\": \"테스으으으으트\"\n" +
+                                    "            }")))
     })
     @GetMapping("/my-participation")
     public ApiResponseDTO<?> viewMyParticipation(@PageableDefault(size = 12) Pageable pageable) {
