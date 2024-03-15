@@ -12,6 +12,6 @@ import java.util.List;
 
 public interface ParticipationRepository extends JpaRepository<Participation, Long> {
     @EntityGraph(attributePaths = "participationImages")
-    @Query("select p from Participation p join fetch p.member where p.board.id = :boardId and p.participationId not in :hidedIds order by p.participationId desc")
-    Page<Participation> findAllByBoardId(@Param("boardId") Long boardId, @Param("hidedIds") List<Long> hidedIds, Pageable pageable);
+    @Query("select p from Participation p join fetch p.member where p.board.id = :boardId order by p.participationId desc")
+    Page<Participation> findAllByBoardId(@Param("boardId") Long boardId, Pageable pageable);
 }
