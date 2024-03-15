@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -73,7 +75,12 @@ public class ParticipationController {
     })
     @GetMapping("/view/{boardId}")
     public ApiResponseDTO<?> viewAllParticipation(@PathVariable Long boardId, @PageableDefault(size = 5) Pageable pageable) {
-        DataWithCount<?> dataWithCount = participationService.findParticipation(boardId, pageable);
+        // 숨김 처리한 참여 게시글 조회를 위해 로그인한 사용자의 ID 를 추출
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = (Member) authentication.getPrincipal();
+
+        DataWithCount<?> dataWithCount = participationService.findParticipation(member.getMemberId(), boardId, pageable);
+
         return new ApiResponseDTO<>(OK, SUCCESS, null, dataWithCount);
     }
 

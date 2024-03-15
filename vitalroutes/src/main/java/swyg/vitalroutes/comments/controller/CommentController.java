@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -73,7 +74,10 @@ public class CommentController {
     })
     @GetMapping("/view/{participationId}")
     public ApiResponseDTO<?> findAllComments(@PathVariable Long participationId, @PageableDefault(size = 5) Pageable pageable) {
-        DataWithCount<?> dataWithCount = commentService.viewComments(participationId, pageable);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = (Member) authentication.getPrincipal();
+
+        DataWithCount<?> dataWithCount = commentService.viewComments(member.getMemberId(), participationId, pageable);
         return new ApiResponseDTO<>(OK, SUCCESS, null, dataWithCount);
     }
 
