@@ -43,6 +43,9 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
     // boardFileEntity파일에서 매핑할 변수이름과 동일하게 작성
     private BoardFileEntity boardFileEntity;
 
+    @OneToMany(mappedBy = "boardEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<BoardTagMapping> boardTagMappingList = new ArrayList<>();
+
     /**
      * 챌린지와 참여의 연관관계
      * 챌린지와 연관관계가 있어야 참여자 관련한 조회가 가능합니다. ex> 참여자 수, 내가 참여한 챌린지

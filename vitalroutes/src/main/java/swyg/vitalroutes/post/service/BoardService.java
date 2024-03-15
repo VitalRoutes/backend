@@ -15,12 +15,8 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.multipart.MultipartFile;
 import swyg.vitalroutes.post.dto.BoardDTO;
 import swyg.vitalroutes.post.dto.ChallengeCheckListDTO;
-import swyg.vitalroutes.post.entity.BoardEntity;
-import swyg.vitalroutes.post.entity.BoardFileEntity;
-import swyg.vitalroutes.post.entity.BoardPathImageEntity;
-import swyg.vitalroutes.post.repository.BoardFileRepository;
-import swyg.vitalroutes.post.repository.BoardPathImageRepository;
-import swyg.vitalroutes.post.repository.BoardRepository;
+import swyg.vitalroutes.post.entity.*;
+import swyg.vitalroutes.post.repository.*;
 import swyg.vitalroutes.s3.S3UploadService;
 
 import java.io.File;
@@ -43,6 +39,9 @@ public class BoardService {
     private final BoardRepository boardRepository; // 생성자 주입방식으로 의존성 주입받음
     private final BoardFileRepository boardFileRepository; // 생성자 주입방식으로 의존성 주입받음
     private final BoardPathImageRepository boardPathImageRepository; // 생성자 주입방식으로 의존성 주입받음
+    private final TagRepository tagRepository;
+    private final PostTagMappingRepository postTagMappingRepository;
+
     private final S3UploadService s3UploadService;
 
     @Transactional
@@ -71,6 +70,17 @@ public class BoardService {
 
             BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, savePath);
             boardFileRepository.save(boardFileEntity);
+
+            // 태그 정보 저장
+            List<String> tags = boardDTO.getTags();
+            for(String tag : tags){
+                TagEntity tagEntity = new TagEntity();
+                tagEntity.setName(tag);
+                tagRepository.save(tagEntity);
+                BoardTagMapping boardTagMapping = new BoardTagMapping();
+                boardTagMapping = BoardTagMapping.savedBoardTagMap(boardEntity, tagEntity);
+                postTagMappingRepository.save(boardTagMapping);
+            }
 
             // 출발지 파일 저장
             System.out.println("saved starting position");
@@ -228,8 +238,8 @@ public class BoardService {
         String savePath = s3UploadService.saveChallengePathImage(pathImageFile);
         System.out.println("save path : " + savePath);
         String storedFileName = System.currentTimeMillis() + "_" + originalFilename; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-        //String saveServerPath = "C:/springboot_img/path/" + originalFilename; // 4.
-        String saveServerPath = "/home/ubuntu/dev/image_resource_dummy/" + originalFilename; // 4.
+        String saveServerPath = "C:/springboot_img/path/" + originalFilename; // 4.
+        //String saveServerPath = "/home/ubuntu/dev/image_resource_dummy/" + originalFilename; // 4.
         pathImageFile.transferTo(new File(saveServerPath)); // 5.
 
         File imageFile = new File(saveServerPath); // 위도 경도
