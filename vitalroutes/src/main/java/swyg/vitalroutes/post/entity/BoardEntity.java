@@ -23,6 +23,11 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
     @Column(length = 20, nullable = false) // 크기 20, not null
     private String boardWriter;
 
+    // 단방향, 연관관계 설정 X
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @Column(length = 24, nullable = false)
     private String boardTitle;
 
@@ -63,10 +68,12 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
     private Member member;
     */
 
-    public static BoardEntity toSaveEntity(BoardDTO boardDTO){
+    public static BoardEntity toSaveEntity(BoardDTO boardDTO, Member member){
         // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
         BoardEntity boardEntity = new BoardEntity();
-        boardEntity.setBoardWriter(boardDTO.getBoardWriter()); // 작성자
+        //boardEntity.setBoardWriter(boardDTO.getBoardWriter()); // 작성자
+        //boardEntity.setMember(member); // 작성자
+        boardEntity.setBoardWriter(member.getNickname()); // 작성자
         boardEntity.setBoardTitle(boardDTO.getBoardTitle()); // 제목
         boardEntity.setBoardContents(boardDTO.getBoardContents()); // 본문
         boardEntity.setBoardTransportation(Integer
@@ -76,10 +83,12 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
         return boardEntity;
     }
 
-    public static BoardEntity toUpdateEntity(BoardDTO boardDTO) {
+    public static BoardEntity toUpdateEntity(BoardDTO boardDTO, Member member) {
         BoardEntity boardEntity = new BoardEntity();
         boardEntity.setId(boardDTO.getId()); // jpa에서 update작업임을 나타내는 id값
-        boardEntity.setBoardWriter(boardDTO.getBoardWriter());
+        //boardEntity.setBoardWriter(boardDTO.getBoardWriter());
+        //boardEntity.setMember(member); // 작성자
+        boardEntity.setBoardWriter(member.getNickname());
         boardEntity.setBoardTitle(boardDTO.getBoardTitle());
         boardEntity.setBoardContents(boardDTO.getBoardContents());
         boardEntity.setBoardTransportation(Integer
@@ -88,10 +97,12 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
         return boardEntity;
     }
 
-    public static BoardEntity toSaveFileEntity(BoardDTO boardDTO) { // service에서 파일첨부가 있는 경우 호출되는 함수
+    public static BoardEntity toSaveFileEntity(BoardDTO boardDTO, Member member) { // service에서 파일첨부가 있는 경우 호출되는 함수
         // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
         BoardEntity boardEntity = new BoardEntity();
-        boardEntity.setBoardWriter(boardDTO.getBoardWriter()); // 작성자
+        //boardEntity.setBoardWriter(boardDTO.getBoardWriter()); // 작성자
+        //boardEntity.setMember(member); // 작성자
+        boardEntity.setBoardWriter(member.getNickname()); // 작성자
         boardEntity.setBoardTitle(boardDTO.getBoardTitle()); // 제목
         boardEntity.setBoardContents(boardDTO.getBoardContents()); // 본문
         boardEntity.setBoardTransportation(Integer

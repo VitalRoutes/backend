@@ -9,10 +9,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.multipart.MultipartFile;
+import swyg.vitalroutes.member.domain.Member;
 import swyg.vitalroutes.post.dto.BoardDTO;
 import swyg.vitalroutes.post.dto.ChallengeCheckListDTO;
 import swyg.vitalroutes.post.entity.*;
@@ -49,11 +51,12 @@ public class BoardService {
     public void save(BoardDTO boardDTO) throws IOException, ImageProcessingException, URISyntaxException {
         // DTO -> Entity로 옮겨 담음
         System.out.println("Saving..... ------------------------------------------------>");
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // 파일 첨부 여부에 따라 로직분리
         if(boardDTO.getTitleImage().isEmpty()){
             // 첨부 파일이 파일이 없음
             System.out.println("Title Image is null");
-            BoardEntity boardEntity = BoardEntity.toSaveEntity(boardDTO);
+            BoardEntity boardEntity = BoardEntity.toSaveEntity(boardDTO, member);
             boardRepository.save(boardEntity); // DB에 insert, save()는 entity클래스를 입력받고 반환한다
         } else{
             System.out.println("saved Title Image");
@@ -64,7 +67,7 @@ public class BoardService {
             System.out.println("save path : " + savePath);
             //titleImage.transferTo(new File(savePath)); // 5. 해당 경로에 파일 저장
             // DB 저장------------------------------
-            BoardEntity boardEntity = BoardEntity.toSaveFileEntity(boardDTO);
+            BoardEntity boardEntity = BoardEntity.toSaveFileEntity(boardDTO, member);
             Long savedId = boardRepository.save(boardEntity).getId(); // 자식 테이블에서는 부모의 pk값이 필요하다
             BoardEntity board = boardRepository.findById(savedId).get(); // 부모 Entity를 DB에서 가져옴
 
@@ -210,7 +213,8 @@ public class BoardService {
             id값이 있다면 => update
             id값이 없다면 => insert
          */
-        BoardEntity boardEntity = BoardEntity.toUpdateEntity(boardDTO);
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        BoardEntity boardEntity = BoardEntity.toUpdateEntity(boardDTO, member);
         boardRepository.save(boardEntity);
         return findById(boardDTO.getId());
     }
@@ -228,6 +232,7 @@ public class BoardService {
                 boardRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC,"id")));
         // PageRequest.of(보고 싶은 페이지, 한 페이지에 보여줄 글 갯수, 정렬 기준(내림차순, Entity에 작성한 id(DB컬럼이 아니다.)))
 
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         System.out.println("boardEntities.getContent() = " + boardEntities.getContent()); // 요청 페이지에 해당하는 글
         System.out.println("boardEntities.getTotalElements() = " + boardEntities.getTotalElements()); // 전체 글갯수
         System.out.println("boardEntities.getNumber() = " + boardEntities.getNumber()); // DB로 요청한 페이지 번호
@@ -238,7 +243,7 @@ public class BoardService {
         System.out.println("boardEntities.isLast() = " + boardEntities.isLast()); // 마지막 페이지 여부
 
         // 목록 : id, writer, title, hit, createdTime => 관련 정보를 담을 BoardDTO객체를 생성해준다.
-        Page<BoardDTO> boardDTOS = boardEntities.map(board -> new BoardDTO(board.getId(), board.getBoardWriter(), board.getBoardTitle(), board.getBoardHits(), board.getCreatedTime())); // boardEntities객체에서 board 매개변수에 담아서 하나씩 꺼내 BoardDTO에 옮긴다.
+        Page<BoardDTO> boardDTOS = boardEntities.map(board -> new BoardDTO(board.getId(), member.getNickname(), board.getBoardTitle(), board.getBoardHits(), board.getCreatedTime())); // boardEntities객체에서 board 매개변수에 담아서 하나씩 꺼내 BoardDTO에 옮긴다.
         return boardDTOS;
     }
 
