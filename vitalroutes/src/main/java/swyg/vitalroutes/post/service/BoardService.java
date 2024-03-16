@@ -76,37 +76,40 @@ public class BoardService {
 
             // 태그 정보 저장
             List<String> tags = boardDTO.getTags();
-            for(String tag : tags){
-                TagEntity tagEntity = new TagEntity();
 
-                List<TagEntity> tagEntities = tagRepository.findAll();
+            if(tags.size() > 0){
+                for(String tag : tags){
+                    TagEntity tagEntity = new TagEntity();
 
-                boolean isTag = false; // 이미 있는 태그인지 확인
-                Long curTagId = 0L;
-                if(tagEntities.size() > 0){
-                    for(TagEntity curTag : tagEntities){
-                        //System.out.println("tag : " + tag);
-                        //System.out.println("cur tag : " + curTag);
-                        if (tag.equals(curTag.getName())){
-                            System.out.println("true");
-                            isTag = true;
-                            curTagId = curTag.getId();
-                            break;
+                    List<TagEntity> tagEntities = tagRepository.findAll();
+
+                    boolean isTag = false; // 이미 있는 태그인지 확인
+                    Long curTagId = 0L;
+                    if(tagEntities.size() > 0){
+                        for(TagEntity curTag : tagEntities){
+                            //System.out.println("tag : " + tag);
+                            //System.out.println("cur tag : " + curTag);
+                            if (tag.equals(curTag.getName())){
+                                System.out.println("true");
+                                isTag = true;
+                                curTagId = curTag.getId();
+                                break;
+                            }
                         }
                     }
-                }
-                if (isTag){
-                    tagEntity.setId(curTagId);
-                    tagEntity.setName(tag);
-                }
-                else {
-                    tagEntity.setName(tag);
-                    tagRepository.save(tagEntity);
-                }
+                    if (isTag){
+                        tagEntity.setId(curTagId);
+                        tagEntity.setName(tag);
+                    }
+                    else {
+                        tagEntity.setName(tag);
+                        tagRepository.save(tagEntity);
+                    }
 
-                BoardTagMapping boardTagMapping = new BoardTagMapping();
-                boardTagMapping = BoardTagMapping.savedBoardTagMap(boardEntity, tagEntity);
-                postTagMappingRepository.save(boardTagMapping);
+                    BoardTagMapping boardTagMapping = new BoardTagMapping();
+                    boardTagMapping = BoardTagMapping.savedBoardTagMap(boardEntity, tagEntity);
+                    postTagMappingRepository.save(boardTagMapping);
+                }
             }
 
             // 출발지 파일 저장
