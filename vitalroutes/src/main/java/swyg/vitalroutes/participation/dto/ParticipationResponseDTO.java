@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class ParticipationResponseDTO {
     private Long participationId;
+    private Long memberId;
     private String memberProfile;
     private String nickname;
     private String content;
@@ -25,6 +26,7 @@ public class ParticipationResponseDTO {
 
     public ParticipationResponseDTO(Participation participation) {
         participationId = participation.getParticipationId();
+        memberId = participation.getMember().getMemberId();
         memberProfile = participation.getMember().getProfile();
         nickname = participation.getMember().getNickname();
         content = participation.getContent();
