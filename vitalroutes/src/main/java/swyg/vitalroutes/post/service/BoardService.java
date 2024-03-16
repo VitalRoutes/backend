@@ -80,19 +80,21 @@ public class BoardService {
                 TagEntity tagEntity = new TagEntity();
 
                 List<TagEntity> tagEntities = tagRepository.findAll();
+
                 boolean isTag = false; // 이미 있는 태그인지 확인
                 Long curTagId = 0L;
-                for(TagEntity curTag : tagEntities){
-                    System.out.println("tag : " + tag);
-                    System.out.println("cur tag : " + curTag);
-                    if (tag.equals(curTag.getName())){
-                        System.out.println("true");
-                        isTag = true;
-                        curTagId = curTag.getId();
-                        break;
+                if(tagEntities.size() > 0){
+                    for(TagEntity curTag : tagEntities){
+                        //System.out.println("tag : " + tag);
+                        //System.out.println("cur tag : " + curTag);
+                        if (tag.equals(curTag.getName())){
+                            System.out.println("true");
+                            isTag = true;
+                            curTagId = curTag.getId();
+                            break;
+                        }
                     }
                 }
-
                 if (isTag){
                     tagEntity.setId(curTagId);
                     tagEntity.setName(tag);
