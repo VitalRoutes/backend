@@ -77,7 +77,7 @@ public class BoardService {
             // 태그 정보 저장
             List<String> tags = boardDTO.getTags();
 
-            if(tags.size() > 0){
+            if(null != tags){
                 for(String tag : tags){
                     TagEntity tagEntity = new TagEntity();
 
