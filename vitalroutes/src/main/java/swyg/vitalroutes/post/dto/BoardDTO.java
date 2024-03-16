@@ -3,6 +3,7 @@ package swyg.vitalroutes.post.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
+import swyg.vitalroutes.participation.domain.Participation;
 import swyg.vitalroutes.post.entity.BoardEntity;
 
 import java.time.LocalDateTime;
@@ -44,7 +45,6 @@ public class BoardDTO {
     // DTO에서 받는 부분은 MultipartFile만 동작
     private MultipartFile titleImage; // 실제 파일을 담아줄 수 있는 역할 (대표사진 저장)
     // save.html -> Controller로 파일 담는용도
-
     //@Schema(description = "Challenge 대표사진 이름을 담는 변수")
     // Service 클래스에서 사용할 것
     private String originalTitleImageName; // 원본 파일 이름
@@ -137,7 +137,8 @@ public class BoardDTO {
         BoardDTO boardDTO = new BoardDTO();
 
         boardDTO.setId(boardEntity.getId());
-        boardDTO.setBoardWriter(boardEntity.getBoardWriter());
+        //boardDTO.setBoardWriter(boardEntity.getBoardWriter());
+        boardDTO.setBoardWriter(boardEntity.getMember().getNickname()); // 작성자
         boardDTO.setBoardTitle(boardEntity.getBoardTitle());
         boardDTO.setBoardContents(boardEntity.getBoardContents());
         boardDTO.setBoardTransportation(String.valueOf(boardEntity.getBoardTransportation()));
