@@ -159,6 +159,30 @@ public class BoardController {
         return new ApiResponseDTO<>(OK, SUCCESS, "챌린지가 조회되었습니다.", challengeCheckDTO);
     }
 
+    @Operation(summary = "{id}에 해당하는 챌린지 좋아요 on", description = "{id}인 챌린지에 좋아요 눌렀습니다.")
+    @ApiResponse(responseCode = "200", description = "{id}에 해당하는 챌린지 좋아요 on")
+    @GetMapping("/likeOn/{id}")
+    public ApiResponseDTO<?> turnOnLikes(@PathVariable("id") Long id, Model model, // 경로상의 값을 가져올때는 @PathVariable를 사용
+                                      @PageableDefault(page=1) Pageable pageable) {
+        /*
+            해당 게시글의 좋아요를 하나 올림
+         */
+        boardService.increaseLikes(id);
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지에 좋아요 눌렀습니다.", null);
+    }
+
+    @Operation(summary = "{id}에 해당하는 챌린지 좋아요 off", description = "{id}인 챌린지에 좋아요 껐습니다.")
+    @ApiResponse(responseCode = "200", description = "{id}에 해당하는 챌린지 좋아요 off")
+    @GetMapping("/likeOff/{id}")
+    public ApiResponseDTO<?> turnOffLikes(@PathVariable("id") Long id, Model model, // 경로상의 값을 가져올때는 @PathVariable를 사용
+                                         @PageableDefault(page=1) Pageable pageable) {
+        /*
+            해당 게시글의 좋아요를 하나 내림
+         */
+        boardService.decreaseLikes(id);
+        return new ApiResponseDTO<>(OK, SUCCESS, "챌린지에 좋아요 내렀습니다.", null);
+    }
+
     private ChallengeCheckDTO getChallengeCheckDTO(BoardDTO boardDTO) {
         ChallengeCheckDTO challengeCheckDTO = new ChallengeCheckDTO();
         challengeCheckDTO.setId(boardDTO.getId());
