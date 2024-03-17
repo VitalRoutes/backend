@@ -122,13 +122,13 @@ public class BoardDTO {
 
     // 생성자 생성
     public BoardDTO(Long id,
-                    String boardWriter,
+                    //String boardWriter,
                     String boardTitle,
                     int boardHits,
                     int boardLikes,
                     LocalDateTime boardCreatedTime) { // 페이징시 보여줄 게시글 목록에 대한 생성자 ( alt + insert )
         this.id = id;
-        this.boardWriter = boardWriter;
+        //this.boardWriter = boardWriter;
         this.boardTitle = boardTitle;
         this.boardHits = boardHits;
         this.boardLikes = boardLikes;
@@ -233,9 +233,9 @@ public class BoardDTO {
 
     public static ChallengeCheckListDTO transformChallengeCheckListDTO(BoardEntity boardEntity) {
         ChallengeCheckListDTO challengeCheckListDTO = new ChallengeCheckListDTO();
-        challengeCheckListDTO.setBoardId(boardEntity.getId());
-        challengeCheckListDTO.setChallengeTitle(boardEntity.getBoardTitle());
-        challengeCheckListDTO.setStoredTitleImageName(boardEntity.getBoardFileEntity().getStoredFileName());
+        challengeCheckListDTO.setBoardId(boardEntity.getId()); // 게시글 id
+        challengeCheckListDTO.setChallengeTitle(boardEntity.getBoardTitle()); // 게시글 제목
+        challengeCheckListDTO.setStoredTitleImageName(boardEntity.getBoardFileEntity().getStoredFileName()); // 게시글 대표사진 경로
         //challengeCheckListDTO.setBoardParty(boardEntity.getParticipationList().size()); // 참여 인원은일단 0세팅
         challengeCheckListDTO.setBoardParty(0); // 참여 인원은일단 0세팅
         //challengeCheckListDTO.setBoardParty(boardDTO.getTotalComments()); // 참여 인원은일단 0세팅
