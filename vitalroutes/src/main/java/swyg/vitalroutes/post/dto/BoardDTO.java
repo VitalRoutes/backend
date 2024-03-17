@@ -33,6 +33,7 @@ public class BoardDTO {
     private String boardTransportation; // 이동수단
     //@Schema(description = "Challenge 조회수를 담는 변수")
     private int boardHits; // 조회수
+    private int boardLikes; // 조회수
     //@Schema(description = "Challenge 생성 시간을 담는 변수")
     private LocalDateTime boardCreatedTime;
     //@Schema(description = "Challenge 수정 시간을 담는 변수")
@@ -124,11 +125,13 @@ public class BoardDTO {
                     String boardWriter,
                     String boardTitle,
                     int boardHits,
+                    int boardLikes,
                     LocalDateTime boardCreatedTime) { // 페이징시 보여줄 게시글 목록에 대한 생성자 ( alt + insert )
         this.id = id;
         this.boardWriter = boardWriter;
         this.boardTitle = boardTitle;
         this.boardHits = boardHits;
+        this.boardLikes = boardLikes;
         this.boardCreatedTime = boardCreatedTime;
     }
 
@@ -143,6 +146,7 @@ public class BoardDTO {
         boardDTO.setBoardContents(boardEntity.getBoardContents());
         boardDTO.setBoardTransportation(String.valueOf(boardEntity.getBoardTransportation()));
         boardDTO.setBoardHits(boardEntity.getBoardHits());
+        boardDTO.setBoardLikes(boardEntity.getBoardLikes());
         boardDTO.setBoardCreatedTime(boardEntity.getCreatedTime());
         boardDTO.setBoardUpdatedTime(boardEntity.getUpdatedTime());
         boardDTO.setTotalComments(boardEntity.getParticipationList().size());   // 참여자 수

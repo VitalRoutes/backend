@@ -30,6 +30,14 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> { // J
     @Query(value = "SELECT p FROM BoardEntity p WHERE p.id < ?1 ORDER BY p.id DESC")
     Page<BoardEntity> findByPostIdLessThanOrderByPostIdDesc(Long lastBoardId, PageRequest pageRequest);
 
+    @Modifying // 업데이트나 삭제 쿼리를 실행할때는 필수로 붙여야함
+    @Query(value = "update BoardEntity b set b.boardLikes=b.boardLikes+1 where b.id=:id") // entity기준으로 Query 작성
+    void increaseLikes(Long id);
+
+    @Modifying // 업데이트나 삭제 쿼리를 실행할때는 필수로 붙여야함
+    @Query(value = "update BoardEntity b set b.boardLikes=b.boardLikes-1 where b.id=:id") // entity기준으로 Query 작성
+    void decreaseLikes(Long id);
+
     //@Query(value = "SELECT MAX(e.id) FROM boardEntity e")
     //Long getMaxId();
 }
