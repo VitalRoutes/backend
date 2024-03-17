@@ -258,7 +258,8 @@ public class BoardService {
         System.out.println("boardEntities.isLast() = " + boardEntities.isLast()); // 마지막 페이지 여부
 
         // 목록 : id, writer, title, hit, createdTime => 관련 정보를 담을 BoardDTO객체를 생성해준다.
-        Page<BoardDTO> boardDTOS = boardEntities.map(board -> new BoardDTO(board.getId(), member.getNickname(), board.getBoardTitle(), board.getBoardHits(), board.getBoardLikes(), board.getCreatedTime())); // boardEntities객체에서 board 매개변수에 담아서 하나씩 꺼내 BoardDTO에 옮긴다.
+        //Page<BoardDTO> boardDTOS = boardEntities.map(board -> new BoardDTO(board.getId(), member.getNickname(), board.getBoardTitle(), board.getBoardHits(), board.getBoardLikes(), board.getCreatedTime())); // boardEntities객체에서 board 매개변수에 담아서 하나씩 꺼내 BoardDTO에 옮긴다.
+        Page<BoardDTO> boardDTOS = boardEntities.map(board -> new BoardDTO(board.getId(), board.getBoardTitle(), board.getBoardHits(), board.getBoardLikes(), board.getCreatedTime())); // boardEntities객체에서 board 매개변수에 담아서 하나씩 꺼내 BoardDTO에 옮긴다.
         return boardDTOS;
     }
 
