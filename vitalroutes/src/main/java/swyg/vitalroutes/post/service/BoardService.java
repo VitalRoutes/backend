@@ -126,21 +126,21 @@ public class BoardService {
             boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 5));
             saved_path_image(boardDTO, boardFileEntity, destinationImage, 5);
 
-            if(boardDTO.getStopOverImage1() != null) { // 경유지1이 있다면
+            if(!boardDTO.getStopOverImage1().isEmpty()) { // 경유지1이 있다면
                 System.out.println("saved stopover 1");
                 MultipartFile stopOverImage1 = boardDTO.getStopOverImage1();
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B01000); // 경유지1 존재여부
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 2));
                 saved_path_image(boardDTO, boardFileEntity, stopOverImage1, 2);
             }
-            if(boardDTO.getStopOverImage2() != null) { // 경유지2이 있다면
+            if(!boardDTO.getStopOverImage2().isEmpty()) { // 경유지2이 있다면
                 System.out.println("saved stopover 2");
                 MultipartFile stopOverImage2 = boardDTO.getStopOverImage2();
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00100); // 경유지2 존재여부 체크
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 3));
                 saved_path_image(boardDTO, boardFileEntity, stopOverImage2, 3);
             }
-            if(boardDTO.getStopOverImage3() != null) { // 경유지1이 있다면
+            if(!boardDTO.getStopOverImage3().isEmpty()) { // 경유지1이 있다면
                 System.out.println("saved stopover 3");
                 MultipartFile stopOverImage3 = boardDTO.getStopOverImage3();
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00010); // 경유지3 존재여부 체크
