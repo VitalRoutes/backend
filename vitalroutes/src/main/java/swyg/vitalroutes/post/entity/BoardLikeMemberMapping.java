@@ -26,13 +26,12 @@ public class BoardLikeMemberMapping {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public static BoardLikeMemberMapping savedBoardLikeMemberMapping(
+    public static BoardLikeMemberMapping savedBoardLikeMemberMap(
             BoardEntity boardEntity,
             Member member) {
         BoardLikeMemberMapping boardLikeMemberMapping = new BoardLikeMemberMapping();
-        //BoardLikeMemberMapping.setBoardEntity(boardEntity);
-        //BoardLikeMemberMapping.setMember(member);
-
+        boardLikeMemberMapping.setBoardEntity(boardEntity);
+        boardLikeMemberMapping.setMember(member);
         return boardLikeMemberMapping;
     }
 }
