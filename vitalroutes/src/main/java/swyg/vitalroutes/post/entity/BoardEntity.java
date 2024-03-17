@@ -41,6 +41,9 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
     private int boardHits;
 
     @Column
+    private int boardLikes;
+
+    @Column
     private int fileAttached; // 파일 있으면 1, 없으면 0
 
     @OneToOne(mappedBy = "boardEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -50,6 +53,9 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
 
     @OneToMany(mappedBy = "boardEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<BoardTagMapping> boardTagMappingList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "boardEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<BoardLikeMemberMapping> boardLikeMemberMappingList = new ArrayList<>();
 
     /**
      * 챌린지와 참여의 연관관계
@@ -72,13 +78,14 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
         // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
         BoardEntity boardEntity = new BoardEntity();
         //boardEntity.setBoardWriter(boardDTO.getBoardWriter()); // 작성자
-        //boardEntity.setMember(member); // 작성자
         boardEntity.setBoardWriter(member.getNickname()); // 작성자
+        boardEntity.setMember(member);
         boardEntity.setBoardTitle(boardDTO.getBoardTitle()); // 제목
         boardEntity.setBoardContents(boardDTO.getBoardContents()); // 본문
         boardEntity.setBoardTransportation(Integer
                 .parseInt(boardDTO.getBoardTransportation())); // 이동 수단 : 걷기(0), 자전거(1)
         boardEntity.setBoardHits(0); // 조회수
+        boardEntity.setBoardLikes(0); // 좋아요수
         boardEntity.setFileAttached(0); // 파일 존재여부 없음
         return boardEntity;
     }
@@ -94,6 +101,8 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
         boardEntity.setBoardTransportation(Integer
                 .parseInt(boardDTO.getBoardTransportation()));
         boardEntity.setBoardHits(boardDTO.getBoardHits());
+        boardEntity.setBoardLikes(boardDTO.getBoardLikes());
+
         return boardEntity;
     }
 
@@ -101,13 +110,14 @@ public class BoardEntity extends BaseEntity { // boardEntity가 BaseEntity를 �
         // save.html에서 입력한 값 -> boardDTO에 담긴 작성자값 -> BoardEntity의 작성자값
         BoardEntity boardEntity = new BoardEntity();
         //boardEntity.setBoardWriter(boardDTO.getBoardWriter()); // 작성자
-        //boardEntity.setMember(member); // 작성자
         boardEntity.setBoardWriter(member.getNickname()); // 작성자
+        boardEntity.setMember(member); // 작성자
         boardEntity.setBoardTitle(boardDTO.getBoardTitle()); // 제목
         boardEntity.setBoardContents(boardDTO.getBoardContents()); // 본문
         boardEntity.setBoardTransportation(Integer
                 .parseInt(boardDTO.getBoardTransportation())); // 이동 수단 : 걷기(0), 자전거(1)
         boardEntity.setBoardHits(0); // 조회수
+        boardEntity.setBoardLikes(0); // 좋아요수
         boardEntity.setFileAttached(1); // 파일 있음.
         return boardEntity;
     }
