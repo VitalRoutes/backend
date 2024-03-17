@@ -140,7 +140,7 @@ public class BoardService {
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 3));
                 saved_path_image(boardDTO, boardFileEntity, stopOverImage2, 3);
             }
-            if(boardDTO.getStopOverImage1() != null) { // 경유지1이 있다면
+            if(boardDTO.getStopOverImage3() != null) { // 경유지1이 있다면
                 System.out.println("saved stopover 3");
                 MultipartFile stopOverImage3 = boardDTO.getStopOverImage3();
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00010); // 경유지3 존재여부 체크
