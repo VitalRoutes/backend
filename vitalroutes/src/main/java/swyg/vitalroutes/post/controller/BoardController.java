@@ -136,7 +136,7 @@ public class BoardController {
 
     @Operation(summary = "{id}에 해당하는 챌린지 상세 조회", description = "{id}에 해당하는 챌린지입니다.")
     @ApiResponse(responseCode = "200", description = "{id}에 해당하는 챌린지 상세 조회 완료")
-    @GetMapping("/{id}")
+    @GetMapping("/detail/{id}")
     /*
     public BoardDTO findById(@PathVariable("id") Long id, Model model, // 경로상의 값을 가져올때는 @PathVariable를 사용
                             @PageableDefault(page=1) Pageable pageable) {
