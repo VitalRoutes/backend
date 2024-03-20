@@ -27,7 +27,7 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
     private static final String[] whitelist = {"/", "/oauth2/**", "/login/kakaoLogin", "/member/duplicateCheck" ,"/member/signUp", "/member/login", "/member/password", "/token/refresh",
-            "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/board/scroll", "/board/scroll/**"};
+            "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/board/scroll", "/board/scroll/**", "/board/detail", "/board/detail/**"};
 
     // 필터를 거치지 않을 URL 을 설정하고, true 를 return 하면 현재 필터를 건너뛰고 다음 필터로 이동
     @Override
