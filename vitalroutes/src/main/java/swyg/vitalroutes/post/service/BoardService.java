@@ -115,37 +115,57 @@ public class BoardService {
             // 출발지 파일 저장
             System.out.println("saved starting position");
             MultipartFile startingPositionImage = boardDTO.getStartingPositionImage();
+            double startingPositionLat = boardDTO.getStartingPosLat();
+            double startingPositionLon = boardDTO.getStartingPosLon();
+
             //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B10000); // 출발지 존재 여부
             boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 1));
-            saved_path_image(boardDTO, boardFileEntity, startingPositionImage, 1);
+            saved_path_image(boardDTO, boardFileEntity,
+                    startingPositionImage, startingPositionLat, startingPositionLon, 1);
 
             // 도착지 파일 저장
             System.out.println("saved destination");
             MultipartFile destinationImage = boardDTO.getDestinationImage();
+            double destinationLat = boardDTO.getDestinationLat();
+            double destinationLon = boardDTO.getDestinationLon();
+
             //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00001); // 도착지 존재 여부 체크
             boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 5));
-            saved_path_image(boardDTO, boardFileEntity, destinationImage, 5);
+            saved_path_image(boardDTO, boardFileEntity,
+                    destinationImage, destinationLat, destinationLon,5);
 
             if(!boardDTO.getStopOverImage1().isEmpty()) { // 경유지1이 있다면
                 System.out.println("saved stopover 1");
                 MultipartFile stopOverImage1 = boardDTO.getStopOverImage1();
+                double stopOver1Lat = boardDTO.getStopOver1Lat();
+                double stopOver1Lon = boardDTO.getStopOver1Lon();
+
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B01000); // 경유지1 존재여부
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 2));
-                saved_path_image(boardDTO, boardFileEntity, stopOverImage1, 2);
+                saved_path_image(boardDTO, boardFileEntity,
+                        stopOverImage1, stopOver1Lat, stopOver1Lon, 2);
             }
             if(!boardDTO.getStopOverImage2().isEmpty()) { // 경유지2이 있다면
                 System.out.println("saved stopover 2");
                 MultipartFile stopOverImage2 = boardDTO.getStopOverImage2();
+                double stopOver2Lat = boardDTO.getStopOver2Lat();
+                double stopOver2Lon = boardDTO.getStopOver2Lon();
+
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00100); // 경유지2 존재여부 체크
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 3));
-                saved_path_image(boardDTO, boardFileEntity, stopOverImage2, 3);
+                saved_path_image(boardDTO, boardFileEntity,
+                        stopOverImage2, stopOver2Lat, stopOver2Lon, 3);
             }
             if(!boardDTO.getStopOverImage3().isEmpty()) { // 경유지1이 있다면
                 System.out.println("saved stopover 3");
                 MultipartFile stopOverImage3 = boardDTO.getStopOverImage3();
+                double stopOver3Lat = boardDTO.getStopOver3Lat();
+                double stopOver3Lon = boardDTO.getStopOver3Lon();
+
                 //boardFileEntity.setExistingPathImage(boardFileEntity.getExistingPathImage() + 0B00010); // 경유지3 존재여부 체크
                 boardFileEntity.setExistingPathImage(setExistingPathImage(boardFileEntity, 4));
-                saved_path_image(boardDTO, boardFileEntity, stopOverImage3, 4);
+                saved_path_image(boardDTO, boardFileEntity,
+                        stopOverImage3, stopOver3Lat, stopOver3Lon, 4);
             }
         }
     }
@@ -292,16 +312,17 @@ public class BoardService {
 
     @Transactional
     public void saved_path_image(BoardDTO boardDTO, BoardFileEntity boardFileEntity,
-                                 MultipartFile pathImageFile,
+                                 MultipartFile pathImageFile, double lat, double lon,
                                  int locationOnRoute) throws IOException, ImageProcessingException, URISyntaxException {
         String originalFilename = pathImageFile.getOriginalFilename(); // 2.
         String savePath = s3UploadService.saveChallengePathImage(pathImageFile);
         System.out.println("save path : " + savePath);
         String storedFileName = System.currentTimeMillis() + "_" + originalFilename; // 3. 시간을 밀리초로 바꾼 난수을 붙임
-        String saveServerPath = "C:/springboot_img/path/" + originalFilename; // 4.
-        //String saveServerPath = "/home/ubuntu/dev/image_resource_dummy/" + originalFilename; // 4.
+        //String saveServerPath = "C:/springboot_img/path/" + originalFilename; // 4.
+        String saveServerPath = "/home/ubuntu/dev/image_resource_dummy/" + originalFilename; // 4.
         pathImageFile.transferTo(new File(saveServerPath)); // 5.
 
+        /*
         File imageFile = new File(saveServerPath); // 위도 경도
         //File imageFile = new File(); // 위도 경도
         Metadata pathImageFileMetadata = ImageMetadataReader.readMetadata(imageFile);
@@ -321,6 +342,13 @@ public class BoardService {
                     lat, lon, locationOnRoute);
             boardPathImageRepository.save(boardPathImageEntity);
         }
+        */
+        // DB 저장------------------------------
+        BoardPathImageEntity boardPathImageEntity = BoardPathImageEntity.toBoardPathImageEntity(boardFileEntity,
+                originalFilename,
+                savePath,
+                lat, lon, locationOnRoute);
+        boardPathImageRepository.save(boardPathImageEntity);
     }
 
     public List<ChallengeCheckListDTO> fetchPostPagesBy(Long lastBoardId, int size){

@@ -68,16 +68,29 @@ public class BoardController {
         challengeSaveFormDTO.setChallengeTransportation(boardDTO.getBoardTransportation());
         challengeSaveFormDTO.setTags(boardDTO.getTags());
         challengeSaveFormDTO.setTitleImage(boardDTO.getTitleImage());
+
         challengeSaveFormDTO.setStartingPositionImage(boardDTO.getStartingPositionImage());
+        challengeSaveFormDTO.setStartingPosLat(boardDTO.getStartingPosLat());
+        challengeSaveFormDTO.setStartingPosLon(boardDTO.getStartingPosLon());
+
         challengeSaveFormDTO.setDestinationImage(boardDTO.getDestinationImage());
+        challengeSaveFormDTO.setDestinationLat(boardDTO.getDestinationLat());
+        challengeSaveFormDTO.setDestinationLon(boardDTO.getDestinationLon());
+
         if(boardDTO.getStopOverImage1() != null) {
             challengeSaveFormDTO.setStopOverImage1(boardDTO.getStopOverImage1());
+            challengeSaveFormDTO.setStopOver1Lat(boardDTO.getStopOver1Lat());
+            challengeSaveFormDTO.setStopOver1Lon(boardDTO.getStopOver1Lon());
         }
         if(boardDTO.getStopOverImage2() != null) {
             challengeSaveFormDTO.setStopOverImage2(boardDTO.getStopOverImage2());
+            challengeSaveFormDTO.setStopOver2Lat(boardDTO.getStopOver2Lat());
+            challengeSaveFormDTO.setStopOver2Lon(boardDTO.getStopOver2Lon());
         }
         if(boardDTO.getStopOverImage3() != null) {
             challengeSaveFormDTO.setStopOverImage3(boardDTO.getStopOverImage3());
+            challengeSaveFormDTO.setStopOver3Lat(boardDTO.getStopOver3Lat());
+            challengeSaveFormDTO.setStopOver3Lon(boardDTO.getStopOver3Lon());
         }
         return challengeSaveFormDTO;
     }
@@ -90,17 +103,30 @@ public class BoardController {
         boardDTO.setBoardTransportation(challengeSaveFormDTO.getChallengeTransportation());
         boardDTO.setTags(challengeSaveFormDTO.getTags());
         boardDTO.setTitleImage(challengeSaveFormDTO.getTitleImage());
-        boardDTO.setStartingPositionImage(challengeSaveFormDTO.getStartingPositionImage());
         boardDTO.setTags(challengeSaveFormDTO.getTags());
+
+        boardDTO.setStartingPositionImage(challengeSaveFormDTO.getStartingPositionImage());
+        boardDTO.setStartingPosLat(challengeSaveFormDTO.getStartingPosLat());
+        boardDTO.setStartingPosLon(challengeSaveFormDTO.getStartingPosLon());
+
         boardDTO.setDestinationImage(challengeSaveFormDTO.getDestinationImage());
+        boardDTO.setDestinationLat(challengeSaveFormDTO.getDestinationLat());
+        boardDTO.setDestinationLon(challengeSaveFormDTO.getDestinationLon());
+
         if(challengeSaveFormDTO.getStopOverImage1() != null) {
             boardDTO.setStopOverImage1(challengeSaveFormDTO.getStopOverImage1());
+            boardDTO.setStopOver1Lat(challengeSaveFormDTO.getStopOver1Lat());
+            boardDTO.setStopOver1Lon(challengeSaveFormDTO.getStopOver1Lon());
         }
         if(challengeSaveFormDTO.getStopOverImage2() != null) {
             boardDTO.setStopOverImage2(challengeSaveFormDTO.getStopOverImage2());
+            boardDTO.setStopOver2Lat(challengeSaveFormDTO.getStopOver2Lat());
+            boardDTO.setStopOver2Lon(challengeSaveFormDTO.getStopOver2Lon());
         }
         if(challengeSaveFormDTO.getStopOverImage3() != null) {
             boardDTO.setStopOverImage3(challengeSaveFormDTO.getStopOverImage3());
+            boardDTO.setStopOver3Lat(challengeSaveFormDTO.getStopOver3Lat());
+            boardDTO.setStopOver3Lon(challengeSaveFormDTO.getStopOver3Lon());
         }
         return boardDTO;
     }

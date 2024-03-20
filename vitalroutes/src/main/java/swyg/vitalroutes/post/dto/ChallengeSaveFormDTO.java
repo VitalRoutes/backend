@@ -34,12 +34,36 @@ public class ChallengeSaveFormDTO {
 
     @Schema(description = "Challenge 이동 경로 사진 중 출발지 사진 파일을 담는 변수")
     private MultipartFile startingPositionImage; // 출발지 이미지 파일 담는용도
+    @Schema(description = "Challenge 이동 경로 사진 중 출발지 위도")
+    private double startingPosLat;
+    @Schema(description = "Challenge 이동 경로 사진 중 출발지 경도")
+    private double startingPosLon;
+    
     @Schema(description = "Challenge 이동 경로 사진 중 도착지 사진 파일을 담는 변수")
     private MultipartFile destinationImage; // 도착지 이미지 파일 담는용도
+    @Schema(description = "Challenge 이동 경로 사진 중 도착지 위도")
+    private double destinationLat;
+    @Schema(description = "Challenge 이동 경로 사진 중 도착지 경도")
+    private double destinationLon;
+
     @Schema(description = "Challenge 이동 경로 사진 중 경유지1 사진 파일을 담는 변수")
     private MultipartFile stopOverImage1; // 경유지1 이미지 파일 담는용도
+    @Schema(description = "Challenge 이동 경로 사진 중 경유지1 위도")
+    private double stopOver1Lat;
+    @Schema(description = "Challenge 이동 경로 사진 중 경유지1 경도")
+    private double stopOver1Lon;
+
     @Schema(description = "Challenge 이동 경로 사진 중 경유지2 사진 파일을 담는 변수")
     private MultipartFile stopOverImage2; // 경유지2 이미지 파일 담는용도
+    @Schema(description = "Challenge 이동 경로 사진 중 경유지2 위도")
+    private double stopOver2Lat;
+    @Schema(description = "Challenge 이동 경로 사진 중 경유지2 경도")
+    private double stopOver2Lon;
+
     @Schema(description = "Challenge 이동 경로 사진 중 경유지3 사진 파일을 담는 변수")
     private MultipartFile stopOverImage3; // 경유지3 이미지 파일 담는용도
+    @Schema(description = "Challenge 이동 경로 사진 중 경유지3 위도")
+    private double stopOver3Lat;
+    @Schema(description = "Challenge 이동 경로 사진 중 경유지3 경도")
+    private double stopOver3Lon;
 }
