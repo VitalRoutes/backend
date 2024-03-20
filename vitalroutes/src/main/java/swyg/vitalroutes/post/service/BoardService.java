@@ -134,9 +134,9 @@ public class BoardService {
             saved_path_image(boardDTO, boardFileEntity,
                     destinationImage, destinationLat, destinationLon,5);
 
-            if(boardDTO.getStopOverImage1().isEmpty()){
+            if(boardDTO.getStopOverImage1() == null){
                 System.out.println("empty stopOver1");
-            } else if(boardDTO.getStopOverImage1() == null){
+            } else if(boardDTO.getStopOverImage1().isEmpty()){
                 System.out.println("null stopOver1");
             } else { // 경유지1이 있다면
                 System.out.println("saved stopover 1");
@@ -151,9 +151,9 @@ public class BoardService {
             }
 
 
-            if(boardDTO.getStopOverImage2().isEmpty()){
+            if(boardDTO.getStopOverImage2() == null){
                 System.out.println("empty stopOver2");
-            } else if(boardDTO.getStopOverImage2() == null){
+            } else if(boardDTO.getStopOverImage2().isEmpty()){
                 System.out.println("null stopOver2");
             } else { // 경유지2이 있다면
                 System.out.println("saved stopover 2");
@@ -168,10 +168,10 @@ public class BoardService {
             }
 
 
-            if(boardDTO.getStopOverImage2().isEmpty()){
-                System.out.println("empty stopOver2");
-            } else if(boardDTO.getStopOverImage2() == null){
-                System.out.println("null stopOver2");
+            if(boardDTO.getStopOverImage3() == null){
+                System.out.println("empty stopOver3");
+            } else if(boardDTO.getStopOverImage3().isEmpty()){
+                System.out.println("null stopOver3");
             } else { // 경유지3이 있다면
                 System.out.println("saved stopover 3");
                 MultipartFile stopOverImage3 = boardDTO.getStopOverImage3();
