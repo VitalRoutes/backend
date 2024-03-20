@@ -49,7 +49,7 @@ public class MemberService {
         Member member = Member.builder()
                 .name(memberDTO.getName())
                 .nickname(memberDTO.getNickname())
-                .profile("https://vital-routes-bucket.s3.ap-northeast-2.amazonaws.com/b8c3384d-22f3-4865-88d1-0fc2a2866e7bprofile.png")
+                .profile("https://vital-routes-bucket.s3.ap-northeast-2.amazonaws.com/5748acbb-1b67-4b45-8bad-ab27e2244f70-default_profile.png")
                 .email(memberDTO.getEmail())
                 .password(passwordEncoder.encode(memberDTO.getPassword()))
                 .build();
@@ -64,6 +64,7 @@ public class MemberService {
         Member member = Member.builder()
                 .name(memberDTO.getName())
                 .nickname(memberDTO.getNickname())
+                .profile("https://vital-routes-bucket.s3.ap-northeast-2.amazonaws.com/5748acbb-1b67-4b45-8bad-ab27e2244f70-default_profile.png")
                 .socialId(memberDTO.getSocialId())
                 .socialType(SocialType.valueOf(memberDTO.getSocialType()))
                 .build();
@@ -126,7 +127,7 @@ public class MemberService {
                 throw new MemberModifyException(BAD_REQUEST, FAIL, "이전 비밀번호가 일치하지 않습니다");
             }
             // 2. 새로운 비밀번호 규칙 준수 확인
-            String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$";
+            String regex = "^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&*()_+=]+)|(?:[0-9]+))$)[A-Za-z\\d~!@#$%^&*()_+=]{8,16}$";
             boolean matchNew = memberModifyDTO.getNewPassword().matches(regex);
             if (!matchNew) {
                 throw new MemberModifyException(BAD_REQUEST, FAIL, "비밀번호는 대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하여야 합니다");
@@ -168,7 +169,7 @@ public class MemberService {
 
         // 비밀번호 규칙을 준수하는지 확인
         String password = passwordDTO.getPassword();
-        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$";
+        String regex = "^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&*()_+=]+)|(?:[0-9]+))$)[A-Za-z\\d~!@#$%^&*()_+=]{8,16}$";
         boolean matches = password.matches(regex);
         if (!matches) {
             throw new MemberModifyException(BAD_REQUEST, FAIL, "비밀번호는 대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하여야 합니다");

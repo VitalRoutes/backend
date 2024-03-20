@@ -29,7 +29,7 @@ public class MemberSaveDTO {
     private String email;
 
     @NotBlank(message = "비밀번호는 필수입력값 입니다")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}$", message = "비밀번호는 대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하여야 합니다")
+    @Pattern(regexp = "^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&*()_+=]+)|(?:[0-9]+))$)[A-Za-z\\d~!@#$%^&*()_+=]{8,16}$", message = "비밀번호는 대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하여야 합니다")
     @Schema(description = "대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하")
     private String password;
 
