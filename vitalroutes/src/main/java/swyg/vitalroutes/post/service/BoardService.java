@@ -134,7 +134,11 @@ public class BoardService {
             saved_path_image(boardDTO, boardFileEntity,
                     destinationImage, destinationLat, destinationLon,5);
 
-            if(!boardDTO.getStopOverImage1().isEmpty()) { // 경유지1이 있다면
+            if(boardDTO.getStopOverImage1().isEmpty()){
+                System.out.println("empty stopOver1");
+            } else if(boardDTO.getStopOverImage1() == null){
+                System.out.println("null stopOver1");
+            } else { // 경유지1이 있다면
                 System.out.println("saved stopover 1");
                 MultipartFile stopOverImage1 = boardDTO.getStopOverImage1();
                 double stopOver1Lat = boardDTO.getStopOver1Lat();
@@ -145,7 +149,13 @@ public class BoardService {
                 saved_path_image(boardDTO, boardFileEntity,
                         stopOverImage1, stopOver1Lat, stopOver1Lon, 2);
             }
-            if(!boardDTO.getStopOverImage2().isEmpty()) { // 경유지2이 있다면
+
+
+            if(boardDTO.getStopOverImage2().isEmpty()){
+                System.out.println("empty stopOver2");
+            } else if(boardDTO.getStopOverImage2() == null){
+                System.out.println("null stopOver2");
+            } else { // 경유지2이 있다면
                 System.out.println("saved stopover 2");
                 MultipartFile stopOverImage2 = boardDTO.getStopOverImage2();
                 double stopOver2Lat = boardDTO.getStopOver2Lat();
@@ -156,7 +166,13 @@ public class BoardService {
                 saved_path_image(boardDTO, boardFileEntity,
                         stopOverImage2, stopOver2Lat, stopOver2Lon, 3);
             }
-            if(!boardDTO.getStopOverImage3().isEmpty()) { // 경유지1이 있다면
+
+
+            if(boardDTO.getStopOverImage2().isEmpty()){
+                System.out.println("empty stopOver2");
+            } else if(boardDTO.getStopOverImage2() == null){
+                System.out.println("null stopOver2");
+            } else { // 경유지3이 있다면
                 System.out.println("saved stopover 3");
                 MultipartFile stopOverImage3 = boardDTO.getStopOverImage3();
                 double stopOver3Lat = boardDTO.getStopOver3Lat();
