@@ -127,7 +127,7 @@ public class MemberService {
                 throw new MemberModifyException(BAD_REQUEST, FAIL, "이전 비밀번호가 일치하지 않습니다");
             }
             // 2. 새로운 비밀번호 규칙 준수 확인
-            String regex = "^(?=.*[a-zA-Z])(?=.*[0-9]).{8,20}$";
+            String regex = "^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&*()_+=]+)|(?:[0-9]+))$)[A-Za-z\\d~!@#$%^&*()_+=]{8,16}$";
             boolean matchNew = memberModifyDTO.getNewPassword().matches(regex);
             if (!matchNew) {
                 throw new MemberModifyException(BAD_REQUEST, FAIL, "비밀번호는 대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하여야 합니다");
@@ -169,7 +169,7 @@ public class MemberService {
 
         // 비밀번호 규칙을 준수하는지 확인
         String password = passwordDTO.getPassword();
-        String regex = "^(?=.*[a-zA-Z])(?=.*[0-9]).{8,20}$";
+        String regex = "^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&*()_+=]+)|(?:[0-9]+))$)[A-Za-z\\d~!@#$%^&*()_+=]{8,16}$";
         boolean matches = password.matches(regex);
         if (!matches) {
             throw new MemberModifyException(BAD_REQUEST, FAIL, "비밀번호는 대문자, 소문자, 숫자를 포함한 최소 8자 이상, 20자 이하여야 합니다");
