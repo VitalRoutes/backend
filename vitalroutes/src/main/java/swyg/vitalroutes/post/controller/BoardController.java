@@ -2,7 +2,12 @@ package swyg.vitalroutes.post.controller;
 
 import com.drew.imaging.ImageProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import swyg.vitalroutes.common.response.ApiResponseDTO;
+import swyg.vitalroutes.common.response.DataWithCount;
 import swyg.vitalroutes.member.dto.MemberNicknameDTO;
 import swyg.vitalroutes.post.dto.BoardDTO;
 import swyg.vitalroutes.post.dto.ChallengeCheckDTO;
@@ -240,33 +246,33 @@ public class BoardController {
             challengeCheckDTO.setStopOver1Lat(boardDTO.getStopOver1Lat());
             challengeCheckDTO.setStopOver1Lon(boardDTO.getStopOver1Lon());
         }
-        else {
-            challengeCheckDTO.setStoredStopOverImage1Name(null);
-            challengeCheckDTO.setStopOver1Lat(-1);
-            challengeCheckDTO.setStopOver1Lon(-1);
-        }
+//        else {
+//            challengeCheckDTO.setStoredStopOverImage1Name(null);
+//            challengeCheckDTO.setStopOver1Lat(-1);
+//            challengeCheckDTO.setStopOver1Lon(-1);
+//        }
 
         if((existingMode & 0B00100) == 0B00100){
             challengeCheckDTO.setStoredStopOverImage2Name(boardDTO.getStoredStopOverImage2Name());
             challengeCheckDTO.setStopOver2Lat(boardDTO.getStopOver2Lat());
             challengeCheckDTO.setStopOver2Lon(boardDTO.getStopOver2Lon());
         }
-        else {
-            challengeCheckDTO.setStoredStopOverImage2Name(null);
-            challengeCheckDTO.setStopOver1Lat(-1);
-            challengeCheckDTO.setStopOver1Lon(-1);
-        }
+//        else {
+//            challengeCheckDTO.setStoredStopOverImage2Name(null);
+//            challengeCheckDTO.setStopOver2Lat(-1);
+//            challengeCheckDTO.setStopOver2Lon(-1);
+//        }
 
         if((existingMode & 0B00010) == 0B00010){
             challengeCheckDTO.setStoredStopOverImage3Name(boardDTO.getStoredStopOverImage3Name());
             challengeCheckDTO.setStopOver3Lat(boardDTO.getStopOver3Lat());
             challengeCheckDTO.setStopOver3Lon(boardDTO.getStopOver3Lon());
         }
-        else {
-            challengeCheckDTO.setStoredStopOverImage3Name(null);
-            challengeCheckDTO.setStopOver1Lat(-1);
-            challengeCheckDTO.setStopOver1Lon(-1);
-        }
+//        else {
+//            challengeCheckDTO.setStoredStopOverImage3Name(null);
+//            challengeCheckDTO.setStopOver3Lat(-1);
+//            challengeCheckDTO.setStopOver3Lon(-1);
+//        }
 
         return challengeCheckDTO;
     }
@@ -350,4 +356,5 @@ public class BoardController {
         int size = 12; // 12개씩 불러옴
         return boardService.fetchPostPagesBy(lastBoardId, size);
     }
+
 }
